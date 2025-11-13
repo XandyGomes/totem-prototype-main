@@ -28,9 +28,11 @@ const Identificacao = () => {
   };
 
   const handleNext = () => {
-    if (cpf.length === 11) {
-      // Simulating validation
+    if (cpf === "11111111111") {
       navigate("/prioridade");
+    }
+    else {
+      navigate("/cpf-invalido");
     }
   };
 
