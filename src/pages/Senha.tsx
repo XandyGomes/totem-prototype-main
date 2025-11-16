@@ -9,22 +9,22 @@ const Senha = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Simulate printing delay
+    // Timer para ir automaticamente para a tela de erro após 5 segundos
     const timer = setTimeout(() => {
-      // In a real app, this would wait for actual print confirmation
+      navigate("/falha-impressao");
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <TotemHeader />
 
       <main className="flex-1 flex items-center justify-center p-[0.5vw]">
-        <Card className="w-[96vw] h-[83vh] flex flex-col justify-center items-center p-[1.5vw] text-center shadow-xl">
+        <Card className="w-[96vw] h-[81vh] flex flex-col justify-center items-center p-[1.5vw] text-center shadow-xl">
           <h1 className="text-[5.5vw] sm:text-[4.5vw] md:text-[4vw] lg:text-[3.5vw] xl:text-[3vw] font-black mb-[3vh] text-foreground">
-            SENHA EMITIDA
+            EMITINDO SENHA...
           </h1>
 
           <div className="mb-[4vh]">
@@ -36,7 +36,7 @@ const Senha = () => {
 
           <div className="space-y-[2vh] w-full max-w-[55vw]">
             <Button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("")}
               size="lg"
               className="w-full h-[9vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg"
             >
@@ -46,15 +46,6 @@ const Senha = () => {
             <p className="text-[2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-black text-muted-foreground">
               Por favor, retire sua senha impressa
             </p>
-            
-            <Button
-              onClick={() => navigate("/falha-impressao")}
-              size="lg"
-              className="w-full h-[6vh] text-[2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-black border-4 shadow-lg"
-              style={{ backgroundColor: "red" }}
-            >
-              TESTE ERRO IMPRESSÃO
-            </Button>
           </div>
         </Card>
       </main>
