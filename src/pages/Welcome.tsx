@@ -11,7 +11,7 @@ const Welcome = () => {
       <TotemHeader />
       
       <main className="flex-1 flex items-center justify-center p-[0.5vw]">
-        <Card className="w-[96vw] h-[80vh] flex flex-col items-center justify-center p-[2vw] text-center shadow-xl">
+        <Card className="w-[96vw] h-[78vh] flex flex-col items-center justify-center p-[2vw] text-center shadow-xl">
           <h1 className="text-[5.5vw] sm:text-[5vw] md:text-[4.5vw] lg:text-[4vw] xl:text-[3.5vw] font-black mb-[1vh] text-foreground">
             BEM-VINDO(A) AO NGA
           </h1>

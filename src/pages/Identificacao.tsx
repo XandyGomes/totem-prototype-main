@@ -20,6 +20,10 @@ const Identificacao = () => {
     setCpf(cpf.slice(0, -1));
   };
 
+  const handleClear = () => {
+    setCpf("");
+  };
+
   const formatCPF = (value: string) => {
     if (value.length <= 3) return value;
     if (value.length <= 6) return `${value.slice(0, 3)}.${value.slice(3)}`;
@@ -41,20 +45,20 @@ const Identificacao = () => {
       <TotemHeader />
       
       <main className="flex-1 flex items-center justify-center p-[0.5vw] overflow-auto">
-        <Card className="w-[96vw] h-[83vh] flex flex-col justify-between p-[1.5vw] shadow-xl">
+        <Card className="w-[96vw] h-[81vh] flex flex-col justify-between p-[1.5vw] shadow-xl">
 
           <div className="text-center">
             <h1 className="text-[4.5vw] sm:text-[4vw] md:text-[3.5vw] lg:text-[3vw] xl:text-[2.5vw] font-black mb-[0.5vh] text-foreground">
               IDENTIFIQUE-SE
             </h1>
             
-            <p className="text-[2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] mb-[1.5vh] text-muted-foreground font-black">
+            <p className="text-[2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] mb-[0.8vh] text-muted-foreground font-black">
               Informe seu CPF ou número do Cartão SUS (CNS)
             </p>
           </div>
 
           <div className="flex-1 flex flex-col justify-center items-center">
-            <div className="w-full max-w-[70vw] mb-[2vh] p-[1vw] border-4 border-border rounded-lg bg-card shadow-lg">
+            <div className="w-full max-w-[70vw] mb-[1.2vh] p-[1vw] border-4 border-border rounded-lg bg-card shadow-lg">
               <input
                 type="text"
                 value={formatCPF(cpf)}
@@ -68,6 +72,7 @@ const Identificacao = () => {
               <NumericKeypad 
                 onNumberClick={handleNumberClick} 
                 onBackspace={handleBackspace}
+                onClear={handleClear}
               />
             </div>
           </div>
