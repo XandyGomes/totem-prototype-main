@@ -40,40 +40,44 @@ const Identificacao = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <TotemHeader />
       
-      <main className="flex-1 flex items-center justify-center p-8">
-        <Card className="w-full max-w-3xl p-12 shadow-xl">
+      <main className="flex-1 flex items-center justify-center p-[0.5vw] overflow-auto">
+        <Card className="w-[96vw] h-[83vh] flex flex-col justify-between p-[1.5vw] shadow-xl">
 
-          <h1 className="text-5xl font-bold mb-4 text-foreground">
-            IDENTIFIQUE-SE
-          </h1>
-          
-          <p className="text-2xl mb-8 text-muted-foreground">
-            Informe seu CPF ou número do Cartão SUS (CNS)
-          </p>
-
-          <div className="mb-8 p-6 border-2 border-border rounded-lg bg-card">
-            <input
-              type="text"
-              value={formatCPF(cpf)}
-              readOnly
-              placeholder="XXX.XXX.XXX-XX"
-              className="w-full text-4xl text-center font-mono bg-transparent border-none outline-none"
-            />
+          <div className="text-center">
+            <h1 className="text-[4.5vw] sm:text-[4vw] md:text-[3.5vw] lg:text-[3vw] xl:text-[2.5vw] font-black mb-[0.5vh] text-foreground">
+              IDENTIFIQUE-SE
+            </h1>
+            
+            <p className="text-[2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] mb-[1.5vh] text-muted-foreground font-black">
+              Informe seu CPF ou número do Cartão SUS (CNS)
+            </p>
           </div>
 
-          <div className="mb-12">
-            <NumericKeypad 
-              onNumberClick={handleNumberClick} 
-              onBackspace={handleBackspace}
-            />
+          <div className="flex-1 flex flex-col justify-center items-center">
+            <div className="w-full max-w-[70vw] mb-[2vh] p-[1vw] border-4 border-border rounded-lg bg-card shadow-lg">
+              <input
+                type="text"
+                value={formatCPF(cpf)}
+                readOnly
+                placeholder="XXX.XXX.XXX-XX"
+                className="w-full text-[3.5vw] sm:text-[3vw] md:text-[2.5vw] lg:text-[2vw] xl:text-[1.8vw] text-center font-mono font-black bg-transparent border-none outline-none"
+              />
+            </div>
+
+            <div className="mb-[1vh]">
+              <NumericKeypad 
+                onNumberClick={handleNumberClick} 
+                onBackspace={handleBackspace}
+              />
+            </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-[1vw]">
             <Button
               onClick={() => navigate("/")}
               variant="outline"
               size="lg"
-              className="flex-1 h-16 text-2xl"
+              className="flex-1 h-[7vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg order-2 sm:order-1"
             >
               VOLTAR
             </Button>
@@ -81,7 +85,7 @@ const Identificacao = () => {
               onClick={handleNext}
               disabled={cpf.length !== 11}
               size="lg"
-              className="flex-1 h-16 text-2xl"
+              className="flex-1 h-[7vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg order-1 sm:order-2"
             >
               AVANÇAR
             </Button>
