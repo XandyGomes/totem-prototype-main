@@ -33,7 +33,7 @@ const Prioridade = () => {
               className="w-full h-[15vh] text-[4vw] sm:text-[3.5vw] md:text-[3vw] lg:text-[2.5vw] xl:text-[2vw] font-black border-4 shadow-lg bg-green-600 hover:bg-green-700 flex items-center justify-center gap-[3vw]"
             >
               <img 
-                src="/src/assets/pcd.png" 
+                src="/pcd.png" 
                 alt="Símbolo PCD" 
                 className="w-[10vw] h-[10vw] sm:w-[8vw] sm:h-[8vw] md:w-[6.5vw] md:h-[6.5vw] lg:w-[5vw] lg:h-[5vw] xl:w-[4vw] xl:h-[4vw]"
               />
