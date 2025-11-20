@@ -2,80 +2,151 @@ import { useNavigate } from "react-router-dom";
 import { TotemHeader } from "@/components/TotemHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useTotem, mockSetores, tiposPrioridade } from "@/contexts/TotemContext";
+import { gerarNumeroSenha, imprimirSenha } from "@/services/consultaService";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { IconePrioridade } from "@/components/IconePrioridade";
 
 const Confirmacao = () => {
   const navigate = useNavigate();
+  const { state, dispatch } = useTotem();
+  const { toast } = useToast();
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  // Mock data - in a real app, this would come from the API
-  const appointmentData = {
-    patient: "Nome Completo do Paciente",
-    date: "Hoje (13/11/2025)",
-    time: "14:30",
-    specialty: "Clínico Geral/Cardiologia",
-    sector: "SETOR B - SALA 105",
-    guideLine: "LINHA VERMELHA",
+  // Se não tem consulta, redireciona para identificação
+  if (!state.consulta) {
+    navigate("/identificacao");
+    return null;
+  }
+
+  const consulta = state.consulta;
+  const prioridade = state.prioridadeSelecionada || {
+    tipo: 'comum' as const,
+    descricao: 'Atendimento não preferencial',
+    nivel: 3 as const
   };
 
-  // Function to get the correct colors based on the guide line
-  const getLineColors = (guideLine: string) => {
-    const line = guideLine.toUpperCase();
+  // Busca o setor e sua cor
+  const setor = mockSetores.find(s => 
+    s.nome.toLowerCase() === consulta.setor.toLowerCase()
+  ) || mockSetores[0];
+
+  // Função para obter cores baseadas no setor
+  const getLineColors = (cor: string) => {
+    const colorMap: { [key: string]: { bg: string; border: string; text: string } } = {
+      '#FF0000': { bg: "bg-red-100", border: "border-red-500", text: "text-red-800" },
+      '#00FF00': { bg: "bg-green-100", border: "border-green-500", text: "text-green-800" },
+      '#0000FF': { bg: "bg-blue-100", border: "border-blue-500", text: "text-blue-800" },
+      '#FFFF00': { bg: "bg-yellow-100", border: "border-yellow-500", text: "text-yellow-800" },
+      '#FF00FF': { bg: "bg-pink-100", border: "border-pink-500", text: "text-pink-800" },
+      '#800080': { bg: "bg-purple-100", border: "border-purple-500", text: "text-purple-800" },
+      '#FFA500': { bg: "bg-orange-100", border: "border-orange-500", text: "text-orange-800" }
+    };
     
-    if (line.includes("VERMELHA")) {
-      return {
-        bg: "bg-red-100",
-        border: "border-red-300",
-        text: "text-red-800"
+    return colorMap[cor] || { bg: "bg-gray-100", border: "border-gray-500", text: "text-gray-800" };
+  };
+
+  const lineColors = getLineColors(setor.cor);
+
+  // Determina o nome da linha baseado na cor
+  const getLineName = (cor: string) => {
+    const lineNames: { [key: string]: string } = {
+      '#FF0000': 'LINHA VERMELHA',
+      '#00FF00': 'LINHA VERDE', 
+      '#0000FF': 'LINHA AZUL',
+      '#FFFF00': 'LINHA AMARELA',
+      '#FF00FF': 'LINHA ROSA',
+      '#800080': 'LINHA ROXA',
+      '#FFA500': 'LINHA LARANJA'
+    };
+    
+    return lineNames[cor] || 'LINHA CINZA';
+  };
+
+  const lineName = getLineName(setor.cor);
+
+  const handleConfirm = async () => {
+    setIsGenerating(true);
+
+    try {
+      // Determina tipo de prioridade para geração de senha
+      let tipoPrioridadeSenha: 'superprioridade' | 'prioritario' | 'comum';
+      
+      if (prioridade.nivel === 1) {
+        tipoPrioridadeSenha = 'superprioridade';
+      } else if (prioridade.nivel === 2) {
+        tipoPrioridadeSenha = 'prioritario';
+      } else {
+        tipoPrioridadeSenha = 'comum';
+      }
+
+      // Gera número da senha
+      const numeroSenha = await gerarNumeroSenha(tipoPrioridadeSenha);
+      
+      const senhaGerada = {
+        numero: numeroSenha,
+        tipo: prioridade.descricao,
+        horario: new Date().toLocaleTimeString('pt-BR', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        }),
+        prioridade
       };
-    } else if (line.includes("AZUL")) {
-      return {
-        bg: "bg-blue-100",
-        border: "border-blue-300",
-        text: "text-blue-800"
-      };
-    } else if (line.includes("VERDE")) {
-      return {
-        bg: "bg-green-100",
-        border: "border-green-300",
-        text: "text-green-800"
-      };
-    } else if (line.includes("AMARELA")) {
-      return {
-        bg: "bg-yellow-100",
-        border: "border-yellow-300",
-        text: "text-yellow-800"
-      };
-    } else if (line.includes("ROSA") || line.includes("PINK")) {
-      return {
-        bg: "bg-pink-100",
-        border: "border-pink-300",
-        text: "text-pink-800"
-      };
-    } else if (line.includes("ROXA") || line.includes("PURPLE")) {
-      return {
-        bg: "bg-purple-100",
-        border: "border-purple-300",
-        text: "text-purple-800"
-      };
-    } else if (line.includes("LARANJA") || line.includes("ORANGE")) {
-      return {
-        bg: "bg-orange-100",
-        border: "border-orange-300",
-        text: "text-orange-800"
-      };
-    } else {
-      // Default gray for unknown lines
-      return {
-        bg: "bg-gray-100",
-        border: "border-gray-300",
-        text: "text-gray-800"
-      };
+
+      // Salva senha no contexto
+      dispatch({ type: 'SET_SENHA_GERADA', payload: senhaGerada });
+
+      // Adiciona à fila
+      dispatch({ 
+        type: 'ADD_TO_FILA', 
+        payload: { 
+          consulta, 
+          prioridade, 
+          senha: senhaGerada 
+        } 
+      });
+
+      // Tenta imprimir
+      const resultadoImpressao = await imprimirSenha({
+        numeroSenha,
+        nomeSetor: setor.nome,
+        nomeMedico: consulta.medico.nome,
+        sala: consulta.sala || 'A definir',
+        prioridade: prioridade.descricao,
+        corSetor: setor.cor
+      });
+
+      if (!resultadoImpressao.sucesso) {
+        navigate("/falha-impressao");
+        return;
+      }
+
+      toast({
+        title: "Senha gerada com sucesso!",
+        description: `Sua senha: ${numeroSenha}`,
+        duration: 3000,
+      });
+
+      navigate("/senha");
+
+    } catch (error) {
+      console.error('Erro ao gerar senha:', error);
+      toast({
+        title: "Erro ao gerar senha",
+        description: "Tente novamente ou procure o atendente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
-  const lineColors = getLineColors(appointmentData.guideLine);
-
-  const handleConfirm = () => {
-    navigate("/senha");
+  const formatDate = (dateStr: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    return dateStr === today ? 'Hoje' : new Date(dateStr).toLocaleDateString('pt-BR');
   };
 
   return (
@@ -86,36 +157,63 @@ const Confirmacao = () => {
         <Card className="w-[90vw] max-w-[800px] h-[78vh] flex flex-col justify-between p-[3vw] sm:p-[2.5vw] md:p-[2vw] shadow-xl">
           <div className="text-center">
             <h1 className="text-[4vw] sm:text-[3.5vw] md:text-[3vw] lg:text-[2.5vw] xl:text-[2vw] font-black mb-[1vh] text-foreground">
-              SUA CONSULTA HOJE
+              CONFIRMAÇÃO DOS DADOS
             </h1>
             
             <p className="text-[1.8vw] sm:text-[1.5vw] md:text-[1.2vw] lg:text-[1vw] xl:text-[0.8vw] font-black mb-[2vh] text-muted-foreground">
-              Por favor, confirme os dados da sua consulta
+              Verifique se todos os dados estão corretos
             </p>
           </div>
 
           <div className="flex-1 flex items-center justify-center">
             <Card className="w-full p-[2.5vw] sm:p-[2vw] md:p-[1.5vw] bg-muted/50 border-4">
-              <div className="space-y-[1.8vh] text-[2.8vw] sm:text-[2.4vw] md:text-[2vw] lg:text-[1.6vw] xl:text-[1.2vw]">
+              <div className="space-y-[1.5vh] text-[2.5vw] sm:text-[2.1vw] md:text-[1.8vw] lg:text-[1.4vw] xl:text-[1.1vw]">
+                
                 <div className="break-words">
-                  <span className="font-black">PACIENTE:</span> <span className="font-black">{appointmentData.patient}</span>
+                  <span className="font-black">PACIENTE:</span> 
+                  <span className="font-bold ml-2">{consulta.paciente.nome}</span>
                 </div>
+                
                 <div>
-                  <span className="font-black">DATA:</span> <span className="font-black">{appointmentData.date}</span>
+                  <span className="font-black">DATA:</span> 
+                  <span className="font-bold ml-2">{formatDate(consulta.data)} ({consulta.hora})</span>
                 </div>
-                <div>
-                  <span className="font-black">HORA:</span> <span className="font-black">{appointmentData.time}</span>
-                </div>
+                
                 <div className="break-words">
-                  <span className="font-black">ESPECIALIDADE:</span> <span className="font-black">{appointmentData.specialty}</span>
+                  <span className="font-black">ESPECIALIDADE:</span> 
+                  <span className="font-bold ml-2">{consulta.medico.especialidade}</span>
                 </div>
+                
                 <div className="break-words">
-                  <span className="font-black">SETOR:</span> <span className="font-black">{appointmentData.sector}</span>
+                  <span className="font-black">MÉDICO:</span> 
+                  <span className="font-bold ml-2">{consulta.medico.nome}</span>
                 </div>
-                <div className={`text-center p-[1.2vh] rounded-lg border-2 ${lineColors.bg} ${lineColors.border}`}>
-                  <span className={`font-black ${lineColors.text} text-[3vw] sm:text-[2.5vw] md:text-[2vw] lg:text-[1.6vw] xl:text-[1.3vw]`}>
-                    SIGA A: {appointmentData.guideLine}
-                  </span>
+                
+                <div className="break-words">
+                  <span className="font-black">SETOR:</span> 
+                  <span className="font-bold ml-2">{setor.nome}</span>
+                </div>
+                
+                <div className="break-words">
+                  <span className="font-black">SALA:</span> 
+                  <span className="font-bold ml-2">{consulta.sala || 'Será informada na recepção'}</span>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className="font-black">ATENDIMENTO:</span>
+                  <Badge variant="outline" className="font-bold flex items-center gap-2">
+                    <IconePrioridade tipo={prioridade.tipo} className="w-4 h-4" />
+                    {prioridade.descricao}
+                  </Badge>
+                </div>
+                
+                <div className={`text-center p-[1.5vh] rounded-lg border-4 ${lineColors.bg} ${lineColors.border} mt-[2vh]`}>
+                  <div className={`font-black ${lineColors.text} text-[3vw] sm:text-[2.5vw] md:text-[2vw] lg:text-[1.6vw] xl:text-[1.3vw]`}>
+                    SIGA A: {lineName}
+                  </div>
+                  <div className={`font-medium ${lineColors.text} text-[1.8vw] sm:text-[1.4vw] md:text-[1.1vw] lg:text-[0.9vw] xl:text-[0.7vw] mt-1`}>
+                    Direção: {setor.nome}
+                  </div>
                 </div>
               </div>
             </Card>
@@ -124,9 +222,10 @@ const Confirmacao = () => {
           <div>
             <div className="flex flex-col sm:flex-row gap-[1.5vw] mb-[1vh]">
               <Button
-                onClick={() => navigate("/prioridade")}
+                onClick={() => navigate(state.isPrioritario ? "/selecionar-prioridade" : "/prioridade")}
                 variant="outline"
                 size="lg"
+                disabled={isGenerating}
                 className="flex-1 h-[6vh] text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-black border-4 shadow-lg order-2 sm:order-1"
               >
                 VOLTAR
@@ -134,9 +233,17 @@ const Confirmacao = () => {
               <Button
                 onClick={handleConfirm}
                 size="lg"
+                disabled={isGenerating}
                 className="flex-1 h-[6vh] text-[1.8vw] sm:text-[1.5vw] md:text-[1.2vw] lg:text-[1vw] xl:text-[0.8vw] font-black border-4 shadow-lg order-1 sm:order-2"
               >
-                CONFIRMAR E IMPRIMIR SENHA
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    GERANDO SENHA...
+                  </>
+                ) : (
+                  "CONFIRMAR E IMPRIMIR SENHA"
+                )}
               </Button>
             </div>
 

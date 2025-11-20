@@ -5,10 +5,17 @@ import { NumericKeypad } from "@/components/NumericKeypad";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Loader2 } from "lucide-react";
+import { useTotem } from "@/contexts/TotemContext";
+import { validarConsultaAgendada, validarSetorCorreto } from "@/services/consultaService";
+import { useToast } from "@/components/ui/use-toast";
 
 const Identificacao = () => {
   const navigate = useNavigate();
+  const { state, dispatch } = useTotem();
+  const { toast } = useToast();
   const [cpf, setCpf] = useState("");
+  const [isValidating, setIsValidating] = useState(false);
 
   const handleNumberClick = (num: string) => {
     if (cpf.length < 11) {
@@ -31,12 +38,77 @@ const Identificacao = () => {
     return `${value.slice(0, 3)}.${value.slice(3, 6)}.${value.slice(6, 9)}-${value.slice(9)}`;
   };
 
-  const handleNext = () => {
-    if (cpf === "11111111111") {
+  const handleNext = async () => {
+    if (cpf.length !== 11) return;
+    
+    setIsValidating(true);
+    
+    try {
+      // Salvar identificação no contexto
+      dispatch({ type: 'SET_IDENTIFICACAO', payload: cpf });
+      
+      // Validar se tem consulta agendada
+      const resultadoConsulta = await validarConsultaAgendada(cpf);
+      
+      if (!resultadoConsulta.sucesso) {
+        // Não tem consulta agendada
+        dispatch({ 
+          type: 'SET_VALIDACAO_CONSULTA', 
+          payload: { 
+            temConsulta: false, 
+            setorCorreto: false, 
+            erro: resultadoConsulta.erro 
+          } 
+        });
+        navigate("/consulta-nao-encontrada");
+        return;
+      }
+      
+      // Salvar consulta encontrada
+      dispatch({ type: 'SET_CONSULTA', payload: resultadoConsulta.consulta! });
+      
+      // Validar se está no setor correto
+      const resultadoSetor = await validarSetorCorreto(resultadoConsulta.consulta!, 'setor-atual');
+      
+      if (!resultadoSetor.sucesso) {
+        dispatch({ 
+          type: 'SET_VALIDACAO_CONSULTA', 
+          payload: { 
+            temConsulta: true, 
+            setorCorreto: false, 
+            erro: resultadoSetor.erro 
+          } 
+        });
+        navigate("/setor-incorreto");
+        return;
+      }
+      
+      // Tudo OK, prosseguir para prioridade
+      dispatch({ 
+        type: 'SET_VALIDACAO_CONSULTA', 
+        payload: { 
+          temConsulta: true, 
+          setorCorreto: true 
+        } 
+      });
+      
+      toast({
+        title: "Consulta encontrada!",
+        description: `Olá, ${resultadoConsulta.consulta!.paciente.nome}`,
+        duration: 2000,
+      });
+      
       navigate("/prioridade");
-    }
-    else {
-      navigate("/cpf-invalido");
+      
+    } catch (error) {
+      console.error('Erro na validação:', error);
+      toast({
+        title: "Erro no sistema",
+        description: "Tente novamente ou procure o atendente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsValidating(false);
     }
   };
 
@@ -82,17 +154,25 @@ const Identificacao = () => {
               onClick={() => navigate("/")}
               variant="outline"
               size="lg"
+              disabled={isValidating}
               className="flex-1 h-[7vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg order-2 sm:order-1"
             >
               VOLTAR
             </Button>
             <Button
               onClick={handleNext}
-              disabled={cpf.length !== 11}
+              disabled={cpf.length !== 11 || isValidating}
               size="lg"
               className="flex-1 h-[7vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg order-1 sm:order-2"
             >
-              AVANÇAR
+              {isValidating ? (
+                <>
+                  <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                  VALIDANDO...
+                </>
+              ) : (
+                "AVANÇAR"
+              )}
             </Button>
           </div>
         </Card>
