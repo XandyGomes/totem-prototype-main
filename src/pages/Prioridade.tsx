@@ -106,7 +106,7 @@ const Prioridade = () => {
                       onClick={() => setShowHelp(false)}
                       variant="outline"
                       size="lg"
-                      className="px-8 py-3 text-lg font-bold"
+                      className="px-8 py-3 text-lg font-bold bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground"
                     >
                       VOLTAR
                     </Button>
@@ -146,7 +146,7 @@ const Prioridade = () => {
               onClick={() => navigate("/identificacao")}
               variant="outline"
               size="lg"
-              className="w-[40vw] h-[7vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg"
+              className="w-[40vw] h-[7vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground"
             >
               VOLTAR
             </Button>

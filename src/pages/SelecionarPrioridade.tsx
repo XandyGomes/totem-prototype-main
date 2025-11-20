@@ -60,51 +60,53 @@ const SelecionarPrioridade = () => {
             </p>
           </div>
 
-          <div className="flex-1 overflow-y-auto space-y-[2vh]">
+          <div className="flex-1 overflow-y-auto space-y-[2vh] max-w-[85vw] mx-auto w-full">
             
             {/* Superprioridade */}
-            <div>
-              <h2 className="text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-bold text-red-600 mb-[1vh] flex items-center">
+            <div className="text-center">
+              <h2 className="text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-bold text-red-600 mb-[1vh]">
                 SUPERPRIORIDADE
               </h2>
               
-              {superPrioridade.map(({ tipo, cor }) => (
-                <Button
-                  key={tipo}
-                  onClick={() => handleSelecionarPrioridade(tipo)}
-                  size="lg"
-                  className={`w-full h-[8vh] text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-bold border-2 shadow-lg ${cor} mb-[1vh] flex items-center justify-start gap-[2vw] px-[2vw]`}
-                >
-                  <IconePrioridade 
-                    tipo={tipo}
-                    className="w-[3vw] h-[3vw] sm:w-[2.5vw] sm:h-[2.5vw] md:w-[2vw] md:h-[2vw] lg:w-[1.5vw] lg:h-[1.5vw] xl:w-[1.2vw] xl:h-[1.2vw]" 
-                  />
-                  <span className="text-white text-left">
-                    {tiposPrioridade[tipo].descricao}
-                  </span>
-                </Button>
-              ))}
+              <div className="flex justify-center">
+                {superPrioridade.map(({ tipo, cor }) => (
+                  <Button
+                    key={tipo}
+                    onClick={() => handleSelecionarPrioridade(tipo)}
+                    size="lg"
+                    className={`w-[70vw] max-w-[600px] h-[8vh] text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-bold border-2 shadow-lg ${cor} mb-[1vh] flex items-center justify-center gap-[2vw] px-[2vw]`}
+                  >
+                    <IconePrioridade 
+                      tipo={tipo}
+                      className="w-[3vw] h-[3vw] sm:w-[2.5vw] sm:h-[2.5vw] md:w-[2vw] md:h-[2vw] lg:w-[1.5vw] lg:h-[1.5vw] xl:w-[1.2vw] xl:h-[1.2vw]" 
+                    />
+                    <span className="text-white text-center">
+                      {tiposPrioridade[tipo].descricao}
+                    </span>
+                  </Button>
+                ))}
+              </div>
             </div>
 
             {/* Atendimento Preferencial Legal */}
-            <div>
-              <h2 className="text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-bold text-orange-600 mb-[1vh] flex items-center">
+            <div className="text-center">
+              <h2 className="text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-bold text-orange-600 mb-[1vh]">
                 ATENDIMENTO PREFERENCIAL LEGAL
               </h2>
               
-              <div className="grid grid-cols-1 gap-[1vh]">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-[1vh] justify-items-center">
                 {prioridadeLegal.map(({ tipo, cor }) => (
                   <Button
                     key={tipo}
                     onClick={() => handleSelecionarPrioridade(tipo)}
                     size="lg"
-                    className={`w-full h-[7vh] text-[2vw] sm:text-[1.6vw] md:text-[1.3vw] lg:text-[1vw] xl:text-[0.9vw] font-medium border-2 shadow-lg ${cor} flex items-center justify-start gap-[2vw] px-[2vw]`}
+                    className={`w-[70vw] xl:w-[32vw] max-w-[500px] h-[7vh] text-[2vw] sm:text-[1.6vw] md:text-[1.3vw] lg:text-[1vw] xl:text-[0.9vw] font-medium border-2 shadow-lg ${cor} flex items-center justify-center gap-[2vw] px-[2vw]`}
                   >
                     <IconePrioridade 
                       tipo={tipo}
                       className="w-[2.5vw] h-[2.5vw] sm:w-[2vw] sm:h-[2vw] md:w-[1.8vw] md:h-[1.8vw] lg:w-[1.3vw] lg:h-[1.3vw] xl:w-[1.1vw] xl:h-[1.1vw]" 
                     />
-                    <span className="text-white text-left">
+                    <span className="text-white text-center">
                       {tiposPrioridade[tipo].descricao}
                     </span>
                   </Button>
@@ -118,7 +120,7 @@ const SelecionarPrioridade = () => {
               onClick={() => navigate("/prioridade")}
               variant="outline"
               size="lg"
-              className="w-[40vw] h-[7vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg"
+              className="w-[40vw] max-w-[300px] h-[7vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground"
             >
               VOLTAR
             </Button>
