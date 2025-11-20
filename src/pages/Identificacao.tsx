@@ -155,7 +155,7 @@ const Identificacao = () => {
               variant="outline"
               size="lg"
               disabled={isValidating}
-              className="flex-1 h-[7vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg order-2 sm:order-1"
+              className="flex-1 h-[7vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg order-2 sm:order-1 bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground"
             >
               VOLTAR
             </Button>

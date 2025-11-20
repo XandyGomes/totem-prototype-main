@@ -46,7 +46,7 @@ const SetorIncorreto = () => {
             <Button
               onClick={() => navigate("/")}
               size="lg"
-              className="flex-1 h-[8vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg"
+              className="flex-1 h-[8vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground"
             >
               VOLTAR AO INÍCIO
             </Button>

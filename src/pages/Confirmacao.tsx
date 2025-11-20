@@ -153,21 +153,21 @@ const Confirmacao = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <TotemHeader />
       
-      <main className="flex-1 flex items-center justify-center p-[2vw]">
-        <Card className="w-[90vw] max-w-[800px] h-[78vh] flex flex-col justify-between p-[3vw] sm:p-[2.5vw] md:p-[2vw] shadow-xl">
+      <main className="flex-1 flex items-center justify-center p-[1.5vw]">
+        <Card className="w-[90vw] max-w-[800px] h-[78vh] flex flex-col justify-between p-[2.5vw] sm:p-[2vw] md:p-[1.5vw] shadow-xl">
           <div className="text-center">
             <h1 className="text-[4vw] sm:text-[3.5vw] md:text-[3vw] lg:text-[2.5vw] xl:text-[2vw] font-black mb-[1vh] text-foreground">
               CONFIRMAÇÃO DOS DADOS
             </h1>
             
-            <p className="text-[1.8vw] sm:text-[1.5vw] md:text-[1.2vw] lg:text-[1vw] xl:text-[0.8vw] font-black mb-[2vh] text-muted-foreground">
+            <p className="text-[1.8vw] sm:text-[1.5vw] md:text-[1.2vw] lg:text-[1vw] xl:text-[0.8vw] font-black mb-[1.5vh] text-muted-foreground">
               Verifique se todos os dados estão corretos
             </p>
           </div>
 
           <div className="flex-1 flex items-center justify-center">
-            <Card className="w-full p-[2.5vw] sm:p-[2vw] md:p-[1.5vw] bg-muted/50 border-4">
-              <div className="space-y-[1.5vh] text-[2.5vw] sm:text-[2.1vw] md:text-[1.8vw] lg:text-[1.4vw] xl:text-[1.1vw]">
+            <Card className="w-full p-[2vw] sm:p-[1.8vw] md:p-[1.3vw] bg-muted/50 border-4">
+              <div className="space-y-[1vh] text-[2.3vw] sm:text-[1.9vw] md:text-[1.6vw] lg:text-[1.3vw] xl:text-[1vw]">
                 
                 <div className="break-words">
                   <span className="font-black">PACIENTE:</span> 
@@ -207,11 +207,11 @@ const Confirmacao = () => {
                   </Badge>
                 </div>
                 
-                <div className={`text-center p-[1.5vh] rounded-lg border-4 ${lineColors.bg} ${lineColors.border} mt-[2vh]`}>
-                  <div className={`font-black ${lineColors.text} text-[3vw] sm:text-[2.5vw] md:text-[2vw] lg:text-[1.6vw] xl:text-[1.3vw]`}>
+                <div className={`text-center p-[1vh] rounded-lg border-4 ${lineColors.bg} ${lineColors.border} mt-[1.5vh]`}>
+                  <div className={`font-black ${lineColors.text} text-[2.8vw] sm:text-[2.3vw] md:text-[1.8vw] lg:text-[1.4vw] xl:text-[1.1vw]`}>
                     SIGA A: {lineName}
                   </div>
-                  <div className={`font-medium ${lineColors.text} text-[1.8vw] sm:text-[1.4vw] md:text-[1.1vw] lg:text-[0.9vw] xl:text-[0.7vw] mt-1`}>
+                  <div className={`font-medium ${lineColors.text} text-[1.6vw] sm:text-[1.2vw] md:text-[1vw] lg:text-[0.8vw] xl:text-[0.6vw] mt-1`}>
                     Direção: {setor.nome}
                   </div>
                 </div>
@@ -220,13 +220,13 @@ const Confirmacao = () => {
           </div>
 
           <div>
-            <div className="flex flex-col sm:flex-row gap-[1.5vw] mb-[1vh]">
+            <div className="flex flex-row gap-[1.5vw] mb-[1vh]">
               <Button
                 onClick={() => navigate(state.isPrioritario ? "/selecionar-prioridade" : "/prioridade")}
                 variant="outline"
                 size="lg"
                 disabled={isGenerating}
-                className="flex-1 h-[6vh] text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-black border-4 shadow-lg order-2 sm:order-1"
+                className="flex-1 h-[8vh] text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-black border-4 shadow-lg bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground"
               >
                 VOLTAR
               </Button>
@@ -234,20 +234,29 @@ const Confirmacao = () => {
                 onClick={handleConfirm}
                 size="lg"
                 disabled={isGenerating}
-                className="flex-1 h-[6vh] text-[1.8vw] sm:text-[1.5vw] md:text-[1.2vw] lg:text-[1vw] xl:text-[0.8vw] font-black border-4 shadow-lg order-1 sm:order-2"
+                className="flex-1 h-[8vh] font-black border-4 shadow-lg flex flex-col items-center justify-center"
               >
                 {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    GERANDO SENHA...
-                  </>
+                  <div className="flex flex-col items-center">
+                    <Loader2 className="h-[2.5vw] w-[2.5vw] sm:h-[2vw] sm:w-[2vw] md:h-[1.5vw] md:w-[1.5vw] lg:h-[1.2vw] lg:w-[1.2vw] xl:h-[1vw] xl:w-[1vw] animate-spin mb-1" />
+                    <span className="text-[1.8vw] sm:text-[1.5vw] md:text-[1.2vw] lg:text-[1vw] xl:text-[0.8vw] leading-tight">
+                      GERANDO SENHA...
+                    </span>
+                  </div>
                 ) : (
-                  "CONFIRMAR E IMPRIMIR SENHA"
+                  <div className="text-center leading-tight">
+                    <div className="text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw]">
+                      CONFIRMAR E
+                    </div>
+                    <div className="text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw]">
+                      IMPRIMIR SENHA
+                    </div>
+                  </div>
                 )}
               </Button>
             </div>
 
-            <p className="text-center text-[1.5vw] sm:text-[1.2vw] md:text-[1vw] lg:text-[0.8vw] xl:text-[0.7vw] font-black text-muted-foreground">
+            <p className="text-center text-[1.3vw] sm:text-[1vw] md:text-[0.8vw] lg:text-[0.7vw] xl:text-[0.6vw] font-black text-muted-foreground">
               Ao confirmar, aguarde a impressão da sua senha.
             </p>
           </div>
