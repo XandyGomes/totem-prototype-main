@@ -1,3 +1,10 @@
+User-agent: *
+Allow: /
+
+# SUS Digital - Sistema de Totem NGA
+# Prefeitura Municipal de Franca
+Sitemap: https://totem-prototype-main.vercel.app/sitemap.xml
+
 User-agent: Googlebot
 Allow: /
 
@@ -10,5 +17,8 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
+User-agent: WhatsApp
+Allow: /
+
+User-agent: LinkedInBot
 Allow: /

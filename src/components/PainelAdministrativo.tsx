@@ -158,232 +158,248 @@ export const PainelAdministrativo: React.FC = () => {
   const alocacaoHoje = alocacoes.filter(a => a.data === new Date().toISOString().split('T')[0]);
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-gray-800">Painel Administrativo NGA</h1>
+    <div className="h-screen w-full flex flex-col overflow-hidden bg-gray-50">
+      {/* Header fixo */}
+      <div className="flex-shrink-0 px-4 py-3 border-b bg-white shadow-sm">
+        <h1 className="text-2xl font-bold text-gray-800">Painel Administrativo NGA</h1>
+        
+        {alertMessage && (
+          <Alert variant="destructive" className="mt-2">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{alertMessage}</AlertDescription>
+          </Alert>
+        )}
+      </div>
       
-      {alertMessage && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{alertMessage}</AlertDescription>
-        </Alert>
-      )}
+      {/* Layout principal com grid 2x2 */}
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full grid grid-cols-2 grid-rows-2 gap-4 p-4">
+          
+          {/* Card 1 - Superior Esquerdo: Computadores na Rede */}
+          <Card className="flex flex-col">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Computadores na Rede</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-hidden">
+              <div className="grid grid-cols-3 gap-2">
+                {computadoresDetectados.map(pc => (
+                  <Badge key={pc} variant="outline" className="justify-center p-2 text-xs">
+                    {pc}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Computadores Detectados */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Computadores Detectados na Rede</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-4 gap-2">
-            {computadoresDetectados.map(pc => (
-              <Badge key={pc} variant="outline" className="justify-center p-2">
-                {pc}
-              </Badge>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Formulário de Nova Alocação */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Nova Alocação de Médico</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium mb-1 block">Médico</label>
-              <Select
-                value={novaAlocacao.medicoId || ''}
-                onValueChange={(value) => setNovaAlocacao(prev => ({ ...prev, medicoId: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o médico" />
-                </SelectTrigger>
-                <SelectContent>
-                  {medicosDisponiveis.map(medico => (
-                    <SelectItem key={medico.id} value={medico.id}>
-                      {medico.nome} - {medico.especialidade}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-1 block">Data</label>
-              <Input
-                type="date"
-                value={novaAlocacao.data || ''}
-                onChange={(e) => setNovaAlocacao(prev => ({ ...prev, data: e.target.value }))}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="text-sm font-medium mb-1 block">Turno</label>
-              <Select
-                value={novaAlocacao.turno || ''}
-                onValueChange={(value: 'manhã' | 'tarde' | 'noite') => 
-                  setNovaAlocacao(prev => ({ ...prev, turno: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="manhã">Manhã</SelectItem>
-                  <SelectItem value="tarde">Tarde</SelectItem>
-                  <SelectItem value="noite">Noite</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-1 block">Sala</label>
-              <Select
-                value={novaAlocacao.sala || ''}
-                onValueChange={(value) => setNovaAlocacao(prev => ({ ...prev, sala: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione a sala" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(salasDisponiveis).map(([setor, salas]) => (
-                    <div key={setor}>
-                      <div className="px-2 py-1 text-sm font-semibold text-gray-600 bg-gray-100">
-                        Setor {setor.charAt(0).toUpperCase() + setor.slice(1)}
-                      </div>
-                      {salas.map(sala => (
-                        <SelectItem key={sala} value={sala}>
-                          {sala}
+          {/* Card 2 - Superior Direito: Nova Alocação */}
+          <Card className="flex flex-col">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Nova Alocação</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-hidden space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Médico</label>
+                  <Select
+                    value={novaAlocacao.medicoId || ''}
+                    onValueChange={(value) => setNovaAlocacao(prev => ({ ...prev, medicoId: value }))}
+                  >
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {medicosDisponiveis.map(medico => (
+                        <SelectItem key={medico.id} value={medico.id}>
+                          {medico.nome} - {medico.especialidade}
                         </SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Data</label>
+                  <Input
+                    type="date"
+                    className="h-9"
+                    value={novaAlocacao.data || ''}
+                    onChange={(e) => setNovaAlocacao(prev => ({ ...prev, data: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Turno</label>
+                  <Select
+                    value={novaAlocacao.turno || ''}
+                    onValueChange={(value: 'manhã' | 'tarde' | 'noite') => 
+                      setNovaAlocacao(prev => ({ ...prev, turno: value }))}
+                  >
+                    <SelectTrigger className="h-9">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="manhã">Manhã</SelectItem>
+                      <SelectItem value="tarde">Tarde</SelectItem>
+                      <SelectItem value="noite">Noite</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Sala</label>
+                  <Select
+                    value={novaAlocacao.sala || ''}
+                    onValueChange={(value) => setNovaAlocacao(prev => ({ ...prev, sala: value }))}
+                  >
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="Sala" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(salasDisponiveis).map(([setor, salas]) => (
+                        <div key={setor}>
+                          <div className="px-2 py-1 text-xs font-semibold text-gray-600 bg-gray-100">
+                            Setor {setor.charAt(0).toUpperCase() + setor.slice(1)}
+                          </div>
+                          {salas.map(sala => (
+                            <SelectItem key={sala} value={sala}>
+                              {sala}
+                            </SelectItem>
+                          ))}
+                        </div>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1 block">PC (Auto)</label>
+                  <Select
+                    value={novaAlocacao.computadorId || ''}
+                    onValueChange={(value) => {
+                      const salaDetectada = detectarSalaPorComputador(value);
+                      setNovaAlocacao(prev => ({ 
+                        ...prev, 
+                        computadorId: value,
+                        sala: salaDetectada || prev.sala 
+                      }));
+                    }}
+                  >
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="Auto" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {computadoresDetectados.map(pc => (
+                        <SelectItem key={pc} value={pc}>
+                          {pc} → {detectarSalaPorComputador(pc)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <Button onClick={adicionarAlocacao} className="w-full h-9">
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar Alocação
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Card 3 - Inferior Esquerdo: Alocações de Hoje */}
+          <Card className="flex flex-col">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Hoje ({alocacaoHoje.length})</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-hidden">
+              {alocacaoHoje.length === 0 ? (
+                <p className="text-gray-500 text-center py-8 text-sm">Nenhuma alocação</p>
+              ) : (
+                <div className="h-full overflow-y-auto space-y-2">
+                  {alocacaoHoje.map(alocacao => (
+                    <div key={alocacao.id} className="flex items-center justify-between p-2 border rounded-lg bg-white">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm truncate">{alocacao.nomeMedico}</div>
+                        <div className="text-xs text-gray-500 truncate">
+                          {alocacao.sala} • {alocacao.turno}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 ml-2">
+                        <Badge 
+                          className={`text-xs px-2 py-1 font-medium ${
+                            alocacao.setor === 'verde' ? 'bg-green-500 text-white' :
+                            alocacao.setor === 'amarelo' ? 'bg-yellow-500 text-black' :
+                            alocacao.setor === 'azul' ? 'bg-blue-500 text-white' : 
+                            alocacao.setor === 'roxo' ? 'bg-purple-500 text-white' : 'bg-gray-500 text-white'
+                          }`}
+                        >
+                          {alocacao.setor.toUpperCase()}
+                        </Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => removerAlocacao(alocacao.id)}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-            <div>
-              <label className="text-sm font-medium mb-1 block">Computador (Opcional)</label>
-              <Select
-                value={novaAlocacao.computadorId || ''}
-                onValueChange={(value) => {
-                  const salaDetectada = detectarSalaPorComputador(value);
-                  setNovaAlocacao(prev => ({ 
-                    ...prev, 
-                    computadorId: value,
-                    sala: salaDetectada || prev.sala 
-                  }));
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Auto-detectar sala" />
-                </SelectTrigger>
-                <SelectContent>
-                  {computadoresDetectados.map(pc => (
-                    <SelectItem key={pc} value={pc}>
-                      {pc} → {detectarSalaPorComputador(pc)}
-                    </SelectItem>
+          {/* Card 4 - Inferior Direito: Todas as Alocações */}
+          <Card className="flex flex-col">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Todas ({alocacoes.length})</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-hidden">
+              {alocacoes.length === 0 ? (
+                <p className="text-gray-500 text-center py-8 text-sm">Nenhuma alocação</p>
+              ) : (
+                <div className="h-full overflow-y-auto space-y-2">
+                  {alocacoes
+                    .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
+                    .map(alocacao => (
+                    <div key={alocacao.id} className="flex items-center justify-between p-2 border rounded-lg bg-white">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-xs truncate">{alocacao.nomeMedico}</div>
+                        <div className="text-xs text-gray-500 truncate">
+                          {alocacao.sala} • {alocacao.data.split('-').reverse().join('/')}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 ml-1">
+                        <Badge 
+                          className={`text-xs px-2 py-1 font-medium ${
+                            alocacao.setor === 'verde' ? 'bg-green-500 text-white' :
+                            alocacao.setor === 'amarelo' ? 'bg-yellow-500 text-black' :
+                            alocacao.setor === 'azul' ? 'bg-blue-500 text-white' : 
+                            alocacao.setor === 'roxo' ? 'bg-purple-500 text-white' : 'bg-gray-500 text-white'
+                          }`}
+                        >
+                          {alocacao.setor.toUpperCase()}
+                        </Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-5 w-5 p-0"
+                          onClick={() => removerAlocacao(alocacao.id)}
+                        >
+                          <Trash2 className="w-2 h-2" />
+                        </Button>
+                      </div>
+                    </div>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <Button onClick={adicionarAlocacao} className="w-full">
-            <Plus className="w-4 h-4 mr-2" />
-            Adicionar Alocação
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Alocações de Hoje */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Alocações de Hoje ({alocacaoHoje.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {alocacaoHoje.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">Nenhuma alocação para hoje</p>
-          ) : (
-            <div className="space-y-2">
-              {alocacaoHoje.map(alocacao => (
-                <div key={alocacao.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex-1">
-                    <div className="font-medium">{alocacao.nomeMedico}</div>
-                    <div className="text-sm text-gray-500">
-                      {alocacao.especialidade} • Sala {alocacao.sala} • Turno da {alocacao.turno}
-                      {alocacao.computadorId && ` • PC: ${alocacao.computadorId}`}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={
-                      alocacao.setor === 'verde' ? 'default' :
-                      alocacao.setor === 'amarelo' ? 'secondary' :
-                      alocacao.setor === 'azul' ? 'outline' : 'destructive'
-                    }>
-                      {alocacao.setor}
-                    </Badge>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removerAlocacao(alocacao.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Todas as Alocações */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Todas as Alocações ({alocacoes.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {alocacoes.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">Nenhuma alocação cadastrada</p>
-          ) : (
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {alocacoes
-                .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
-                .map(alocacao => (
-                <div key={alocacao.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex-1">
-                    <div className="font-medium">{alocacao.nomeMedico}</div>
-                    <div className="text-sm text-gray-500">
-                      {alocacao.especialidade} • Sala {alocacao.sala} • {alocacao.data} • {alocacao.turno}
-                      {alocacao.computadorId && ` • PC: ${alocacao.computadorId}`}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={
-                      alocacao.setor === 'verde' ? 'default' :
-                      alocacao.setor === 'amarelo' ? 'secondary' :
-                      alocacao.setor === 'azul' ? 'outline' : 'destructive'
-                    }>
-                      {alocacao.setor}
-                    </Badge>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removerAlocacao(alocacao.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };

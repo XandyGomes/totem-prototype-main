@@ -24,7 +24,7 @@ const FalhaImpressao = () => {
           </p>
 
           <Button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/teste")}
             size="lg"
             className="w-full max-w-[40vw] h-[8vw] sm:h-[7vw] md:h-[6vw] lg:h-[5vw] xl:h-[4.5vw] text-[3vw] sm:text-[2.5vw] md:text-[2vw] lg:text-[1.8vw] xl:text-[1.5vw] font-black border-4 shadow-lg mb-[3vw] sm:mb-[2.5vw]"
           >

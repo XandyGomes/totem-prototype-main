@@ -1,0 +1,27 @@
+{
+  "name": "NGA - Sistema de Totem SUS Digital",
+  "short_name": "SUS Digital Totem",
+  "description": "Sistema inteligente de totem para gestão de filas e confirmação de consultas do SUS Digital - Prefeitura de Franca",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#1e40af",
+  "theme_color": "#1e40af",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/sus-digital.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["health", "medical", "government"],
+  "lang": "pt-BR",
+  "scope": "/",
+  "id": "nga-sus-digital-totem"
+}
