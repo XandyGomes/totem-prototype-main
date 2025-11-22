@@ -30,7 +30,7 @@ const Confirmacao = () => {
   };
 
   // Busca o setor e sua cor
-  const setor = mockSetores.find(s => 
+  const setor = mockSetores.find(s =>
     s.nome.toLowerCase() === consulta.setor.toLowerCase()
   ) || mockSetores[0];
 
@@ -45,7 +45,7 @@ const Confirmacao = () => {
       '#800080': { bg: "bg-purple-100", border: "border-purple-500", text: "text-purple-800" },
       '#FFA500': { bg: "bg-orange-100", border: "border-orange-500", text: "text-orange-800" }
     };
-    
+
     return colorMap[cor] || { bg: "bg-gray-100", border: "border-gray-500", text: "text-gray-800" };
   };
 
@@ -55,14 +55,14 @@ const Confirmacao = () => {
   const getLineName = (cor: string) => {
     const lineNames: { [key: string]: string } = {
       '#FF0000': 'LINHA VERMELHA',
-      '#00FF00': 'LINHA VERDE', 
+      '#00FF00': 'LINHA VERDE',
       '#0000FF': 'LINHA AZUL',
       '#FFFF00': 'LINHA AMARELA',
       '#FF00FF': 'LINHA ROSA',
       '#800080': 'LINHA ROXA',
       '#FFA500': 'LINHA LARANJA'
     };
-    
+
     return lineNames[cor] || 'LINHA CINZA';
   };
 
@@ -74,7 +74,7 @@ const Confirmacao = () => {
     try {
       // Determina tipo de prioridade para geração de senha
       let tipoPrioridadeSenha: 'superprioridade' | 'prioritario' | 'comum';
-      
+
       if (prioridade.nivel === 1) {
         tipoPrioridadeSenha = 'superprioridade';
       } else if (prioridade.nivel === 2) {
@@ -85,13 +85,13 @@ const Confirmacao = () => {
 
       // Gera número da senha
       const numeroSenha = await gerarNumeroSenha(tipoPrioridadeSenha);
-      
+
       const senhaGerada = {
         numero: numeroSenha,
         tipo: prioridade.descricao,
-        horario: new Date().toLocaleTimeString('pt-BR', { 
-          hour: '2-digit', 
-          minute: '2-digit' 
+        horario: new Date().toLocaleTimeString('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit'
         }),
         prioridade
       };
@@ -100,13 +100,13 @@ const Confirmacao = () => {
       dispatch({ type: 'SET_SENHA_GERADA', payload: senhaGerada });
 
       // Adiciona à fila
-      dispatch({ 
-        type: 'ADD_TO_FILA', 
-        payload: { 
-          consulta, 
-          prioridade, 
-          senha: senhaGerada 
-        } 
+      dispatch({
+        type: 'ADD_TO_FILA',
+        payload: {
+          consulta,
+          prioridade,
+          senha: senhaGerada
+        }
       });
 
       // Tenta imprimir
@@ -152,14 +152,14 @@ const Confirmacao = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <TotemHeader />
-      
+
       <main className="flex-1 flex items-center justify-center p-[1.5vw]">
         <Card className="w-[90vw] max-w-[800px] h-[78vh] flex flex-col justify-between p-[2.5vw] sm:p-[2vw] md:p-[1.5vw] shadow-xl">
           <div className="text-center">
             <h1 className="text-[4vw] sm:text-[3.5vw] md:text-[3vw] lg:text-[2.5vw] xl:text-[2vw] font-black mb-[1vh] text-foreground">
               CONFIRMAÇÃO DOS DADOS
             </h1>
-            
+
             <p className="text-[1.8vw] sm:text-[1.5vw] md:text-[1.2vw] lg:text-[1vw] xl:text-[0.8vw] font-black mb-[1.5vh] text-muted-foreground">
               Verifique se todos os dados estão corretos
             </p>
@@ -167,53 +167,65 @@ const Confirmacao = () => {
 
           <div className="flex-1 flex items-center justify-center">
             <Card className="w-full p-[2vw] sm:p-[1.8vw] md:p-[1.3vw] bg-muted/50 border-4">
-              <div className="space-y-[1vh] text-[2.3vw] sm:text-[1.9vw] md:text-[1.6vw] lg:text-[1.3vw] xl:text-[1vw]">
-                
-                <div className="break-words">
-                  <span className="font-black">PACIENTE:</span> 
-                  <span className="font-bold ml-2">{consulta.paciente.nome}</span>
-                </div>
-                
-                <div>
-                  <span className="font-black">DATA:</span> 
-                  <span className="font-bold ml-2">{formatDate(consulta.data)} ({consulta.hora})</span>
-                </div>
-                
-                <div className="break-words">
-                  <span className="font-black">ESPECIALIDADE:</span> 
-                  <span className="font-bold ml-2">{consulta.medico.especialidade}</span>
-                </div>
-                
-                <div className="break-words">
-                  <span className="font-black">MÉDICO:</span> 
-                  <span className="font-bold ml-2">{consulta.medico.nome}</span>
-                </div>
-                
-                <div className="break-words">
-                  <span className="font-black">SETOR:</span> 
-                  <span className="font-bold ml-2">{setor.nome}</span>
-                </div>
-                
-                <div className="break-words">
-                  <span className="font-black">SALA:</span> 
-                  <span className="font-bold ml-2">{consulta.sala || 'Será informada na recepção'}</span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <span className="font-black">ATENDIMENTO:</span>
-                  <Badge variant="outline" className="font-bold flex items-center gap-2">
-                    <IconePrioridade tipo={prioridade.tipo} className="w-4 h-4" />
-                    {prioridade.descricao}
-                  </Badge>
-                </div>
-                
-                <div className={`text-center p-[1vh] rounded-lg border-4 ${lineColors.bg} ${lineColors.border} mt-[1.5vh]`}>
-                  <div className={`font-black ${lineColors.text} text-[2.8vw] sm:text-[2.3vw] md:text-[1.8vw] lg:text-[1.4vw] xl:text-[1.1vw]`}>
-                    SIGA A: {lineName}
+              <div className="flex flex-row gap-[2vw]">
+                <div className="flex-1 space-y-[1vh] text-[2.3vw] sm:text-[1.9vw] md:text-[1.6vw] lg:text-[1.3vw] xl:text-[1vw]">
+
+                  <div className="break-words">
+                    <span className="font-black">PACIENTE:</span>
+                    <span className="font-bold ml-2">{consulta.paciente.nome}</span>
                   </div>
-                  <div className={`font-medium ${lineColors.text} text-[1.6vw] sm:text-[1.2vw] md:text-[1vw] lg:text-[0.8vw] xl:text-[0.6vw] mt-1`}>
-                    Direção: {setor.nome}
+
+                  <div>
+                    <span className="font-black">DATA:</span>
+                    <span className="font-bold ml-2">{formatDate(consulta.data)} ({consulta.hora})</span>
                   </div>
+
+                  <div className="break-words">
+                    <span className="font-black">ESPECIALIDADE:</span>
+                    <span className="font-bold ml-2">{consulta.medico.especialidade}</span>
+                  </div>
+
+                  <div className="break-words">
+                    <span className="font-black">MÉDICO:</span>
+                    <span className="font-bold ml-2">{consulta.medico.nome}</span>
+                  </div>
+
+                  <div className="break-words">
+                    <span className="font-black">SETOR:</span>
+                    <span className="font-bold ml-2">{setor.nome}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="font-black">ATENDIMENTO:</span>
+                    <Badge variant="outline" className="font-bold flex items-center gap-2">
+                      <IconePrioridade tipo={prioridade.tipo} className="w-4 h-4" />
+                      {prioridade.descricao}
+                    </Badge>
+                  </div>
+                </div>
+
+                <Card className={`min-w-[25%] bg-background border-4 flex flex-col items-center justify-center p-[1vw] shadow-sm ${lineColors.border}`}>
+                  <span className="text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] font-black text-muted-foreground uppercase">
+                    SALA
+                  </span>
+                  <span className={`text-[6vw] sm:text-[5vw] md:text-[4vw] font-black ${lineColors.text} leading-none`}>
+                    {consulta.sala || '--'}
+                  </span>
+                  {/* Caso não tenha sala definida, mostra texto menor */}
+                  {!consulta.sala && (
+                    <span className="text-[1.2vw] sm:text-[1vw] text-center font-bold text-muted-foreground leading-tight">
+                      A definir
+                    </span>
+                  )}
+                </Card>
+              </div>
+
+              <div className={`text-center p-[1vh] rounded-lg border-4 ${lineColors.bg} ${lineColors.border} mt-[1.5vh]`}>
+                <div className={`font-black ${lineColors.text} text-[2.8vw] sm:text-[2.3vw] md:text-[1.8vw] lg:text-[1.4vw] xl:text-[1.1vw]`}>
+                  SIGA A: {lineName}
+                </div>
+                <div className={`font-medium ${lineColors.text} text-[1.6vw] sm:text-[1.2vw] md:text-[1vw] lg:text-[0.8vw] xl:text-[0.6vw] mt-1`}>
+                  Direção: {setor.nome}
                 </div>
               </div>
             </Card>
