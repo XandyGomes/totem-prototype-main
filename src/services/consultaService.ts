@@ -72,7 +72,7 @@ export const verificarMedicoDisponivel = async (medicoId: string): Promise<{
   // Por enquanto, simula que o médico está sempre disponível
   return {
     disponivel: true,
-    sala: 'Sala 11', // Seria obtido do sistema de alocação de salas
+    sala: '11', // Seria obtido do sistema de alocação de salas
     horarioProximo: '15 minutos'
   };
 };

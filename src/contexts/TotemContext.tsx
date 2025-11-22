@@ -225,7 +225,7 @@ export const mockConsultas: Consulta[] = [
     paciente: { cpf: '11111111111', nome: 'João Silva Santos', idade: 45 },
     medico: { id: 'med1', nome: 'Dr. Carlos Oliveira', especialidade: 'Cardiologia', crm: 'CRM/SP 123456' },
     setor: 'Cardiologia',
-    sala: 'Sala 11',
+    sala: '11',
     status: 'agendada'
   },
   {
@@ -235,15 +235,15 @@ export const mockConsultas: Consulta[] = [
     paciente: { cpf: '22222222222', nome: 'Maria José Ferreira', idade: 82 },
     medico: { id: 'med2', nome: 'Dra. Ana Santos', especialidade: 'Geriatria', crm: 'CRM/SP 654321' },
     setor: 'Geriatria',
-    sala: 'Sala 15',
+    sala: '15',
     status: 'agendada'
   }
 ];
 
 export const mockSetores: Setor[] = [
-  { id: 'cardiologia', nome: 'Cardiologia', cor: '#FF0000', salas: ['Sala 11', 'Sala 12', 'Sala 13'] },
-  { id: 'geriatria', nome: 'Geriatria', cor: '#00FF00', salas: ['Sala 14', 'Sala 15', 'Sala 16'] },
-  { id: 'ortopedia', nome: 'Ortopedia', cor: '#0000FF', salas: ['Sala 17', 'Sala 18', 'Sala 19'] }
+  { id: 'cardiologia', nome: 'Cardiologia', cor: '#FF0000', salas: ['11', '12', '13'] },
+  { id: 'geriatria', nome: 'Geriatria', cor: '#00FF00', salas: ['14', '15', '16'] },
+  { id: 'ortopedia', nome: 'Ortopedia', cor: '#0000FF', salas: ['17', '18', '19'] }
 ];
 
 // Mapeamento de ícones para tipos de prioridade

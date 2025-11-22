@@ -11,7 +11,7 @@ const PaginaMedico = () => {
     nome: 'Dr. Carlos Oliveira',
     especialidade: 'Cardiologia',
     crm: '12345-SP',
-    sala: 'Sala 11'
+    sala: '11'
   };
 
   useEffect(() => {
