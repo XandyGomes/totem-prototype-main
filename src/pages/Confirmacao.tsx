@@ -153,92 +153,89 @@ const Confirmacao = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <TotemHeader />
 
-      <main className="flex-1 flex items-center justify-center p-[1.5vw]">
-        <Card className="w-[90vw] max-w-[800px] h-[78vh] flex flex-col justify-between p-[2.5vw] sm:p-[2vw] md:p-[1.5vw] shadow-xl">
-          <div className="text-center">
-            <h1 className="text-[4vw] sm:text-[3.5vw] md:text-[3vw] lg:text-[2.5vw] xl:text-[2vw] font-black mb-[1vh] text-foreground">
+      <main className="flex-1 flex items-center justify-center p-[0.5vw] overflow-hidden">
+        <Card className="w-[96vw] h-[81vh] flex flex-col justify-between p-[2vw] shadow-xl">
+          <div className="text-center mb-[2vh]">
+            <h1 className="text-[5vw] font-black mb-[1vh] text-foreground leading-tight">
               CONFIRMAÇÃO DOS DADOS
             </h1>
 
-            <p className="text-[1.8vw] sm:text-[1.5vw] md:text-[1.2vw] lg:text-[1vw] xl:text-[0.8vw] font-black mb-[1.5vh] text-muted-foreground">
+            <p className="text-[3vw] font-black mb-[1vh] text-muted-foreground">
               Verifique se todos os dados estão corretos
             </p>
           </div>
 
-          <div className="flex-1 flex items-center justify-center">
-            <Card className="w-full p-[2vw] sm:p-[1.8vw] md:p-[1.3vw] bg-muted/50 border-4">
-              <div className="flex flex-row gap-[2vw]">
-                <div className="flex-1 space-y-[1vh] text-[2.3vw] sm:text-[1.9vw] md:text-[1.6vw] lg:text-[1.3vw] xl:text-[1vw]">
+          <div className="flex-1 flex flex-col justify-center gap-[2vh]">
+            <Card className="w-full p-[2vw] bg-muted/50 border-4 rounded-2xl shadow-inner">
+              <div className="flex flex-col gap-[2vh]">
+                <div className="flex flex-row gap-[2vw]">
+                  <div className="flex-1 space-y-[1.5vh] text-[3vw] leading-tight">
 
-                  <div className="break-words">
-                    <span className="font-black">PACIENTE:</span>
-                    <span className="font-bold ml-2">{consulta.paciente.nome}</span>
+                    <div className="break-words">
+                      <span className="font-black text-muted-foreground block text-[2.2vw]">PACIENTE</span>
+                      <span className="font-bold text-foreground">{consulta.paciente.nome}</span>
+                    </div>
+
+                    <div>
+                      <span className="font-black text-muted-foreground block text-[2.2vw]">DATA E HORA</span>
+                      <span className="font-bold text-foreground">{formatDate(consulta.data)} às {consulta.hora}</span>
+                    </div>
+
+                    <div className="break-words">
+                      <span className="font-black text-muted-foreground block text-[2.2vw]">ESPECIALIDADE/MÉDICO</span>
+                      <span className="font-bold text-foreground">{consulta.medico.especialidade}</span>
+                      <div className="text-[2.5vw] text-foreground/80">{consulta.medico.nome}</div>
+                    </div>
+
+                    <div className="break-words">
+                      <span className="font-black text-muted-foreground block text-[2.2vw]">SETOR</span>
+                      <span className="font-bold text-foreground">{setor.nome}</span>
+                    </div>
+
+                    <div>
+                      <span className="font-black text-muted-foreground block text-[2.2vw]">ATENDIMENTO</span>
+                      <Badge variant="outline" className="font-bold inline-flex items-center gap-2 px-3 py-1 text-[2.5vw] h-auto border-2 mt-1">
+                        <IconePrioridade tipo={prioridade.tipo} className="w-[4vw] h-[4vw]" />
+                        {prioridade.descricao}
+                      </Badge>
+                    </div>
                   </div>
 
-                  <div>
-                    <span className="font-black">DATA:</span>
-                    <span className="font-bold ml-2">{formatDate(consulta.data)} ({consulta.hora})</span>
-                  </div>
-
-                  <div className="break-words">
-                    <span className="font-black">ESPECIALIDADE:</span>
-                    <span className="font-bold ml-2">{consulta.medico.especialidade}</span>
-                  </div>
-
-                  <div className="break-words">
-                    <span className="font-black">MÉDICO:</span>
-                    <span className="font-bold ml-2">{consulta.medico.nome}</span>
-                  </div>
-
-                  <div className="break-words">
-                    <span className="font-black">SETOR:</span>
-                    <span className="font-bold ml-2">{setor.nome}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="font-black">ATENDIMENTO:</span>
-                    <Badge variant="outline" className="font-bold flex items-center gap-2">
-                      <IconePrioridade tipo={prioridade.tipo} className="w-4 h-4" />
-                      {prioridade.descricao}
-                    </Badge>
-                  </div>
-                </div>
-
-                <Card className={`min-w-[25%] bg-background border-4 flex flex-col items-center justify-center p-[1vw] shadow-sm ${lineColors.border}`}>
-                  <span className="text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] font-black text-muted-foreground uppercase">
-                    SALA
-                  </span>
-                  <span className={`text-[6vw] sm:text-[5vw] md:text-[4vw] font-black ${lineColors.text} leading-none`}>
-                    {consulta.sala || '--'}
-                  </span>
-                  {/* Caso não tenha sala definida, mostra texto menor */}
-                  {!consulta.sala && (
-                    <span className="text-[1.2vw] sm:text-[1vw] text-center font-bold text-muted-foreground leading-tight">
-                      A definir
+                  <Card className={`min-w-[30%] bg-background border-4 flex flex-col items-center justify-center p-[1vw] shadow-sm ${lineColors.border} rounded-xl self-start`}>
+                    <span className="text-[2.5vw] font-black text-muted-foreground uppercase mb-1">
+                      SALA
                     </span>
-                  )}
-                </Card>
+                    <span className={`text-[12vw] font-black ${lineColors.text} leading-none`}>
+                      {consulta.sala || '--'}
+                    </span>
+                    {!consulta.sala && (
+                      <span className="text-[2vw] text-center font-bold text-muted-foreground leading-tight mt-1">
+                        A definir
+                      </span>
+                    )}
+                  </Card>
+                </div>
               </div>
 
-              <div className={`text-center p-[1vh] rounded-lg border-4 ${lineColors.bg} ${lineColors.border} mt-[1.5vh]`}>
-                <div className={`font-black ${lineColors.text} text-[2.8vw] sm:text-[2.3vw] md:text-[1.8vw] lg:text-[1.4vw] xl:text-[1.1vw]`}>
+              <div className={`text-center p-[2vh] rounded-xl border-4 ${lineColors.bg} ${lineColors.border} mt-[3vh]`}>
+                <div className={`font-black ${lineColors.text} text-[4vw] leading-none`}>
                   SIGA A: {lineName}
                 </div>
-                <div className={`font-medium ${lineColors.text} text-[1.6vw] sm:text-[1.2vw] md:text-[1vw] lg:text-[0.8vw] xl:text-[0.6vw] mt-1`}>
+                <div className={`font-medium ${lineColors.text} text-[2.5vw] mt-[0.5vh]`}>
                   Direção: {setor.nome}
                 </div>
               </div>
             </Card>
           </div>
 
-          <div>
-            <div className="flex flex-row gap-[1.5vw] mb-[1vh]">
+          <div className="mt-[2vh]">
+            <div className="flex flex-row gap-[2vw] mb-[2vh]">
               <Button
                 onClick={() => navigate(state.isPrioritario ? "/selecionar-prioridade" : "/prioridade")}
                 variant="outline"
                 size="lg"
                 disabled={isGenerating}
-                className="flex-1 h-[8vh] text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-black border-4 shadow-lg bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground"
+                className="flex-1 h-[12vh] text-[3.5vw] font-black border-4 shadow-lg bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground rounded-2xl"
               >
                 VOLTAR
               </Button>
@@ -246,29 +243,26 @@ const Confirmacao = () => {
                 onClick={handleConfirm}
                 size="lg"
                 disabled={isGenerating}
-                className="flex-1 h-[8vh] font-black border-4 shadow-lg flex flex-col items-center justify-center"
+                className="flex-1 h-[12vh] font-black border-4 shadow-lg flex flex-col items-center justify-center rounded-2xl bg-primary hover:bg-primary/90"
               >
                 {isGenerating ? (
                   <div className="flex flex-col items-center">
-                    <Loader2 className="h-[2.5vw] w-[2.5vw] sm:h-[2vw] sm:w-[2vw] md:h-[1.5vw] md:w-[1.5vw] lg:h-[1.2vw] lg:w-[1.2vw] xl:h-[1vw] xl:w-[1vw] animate-spin mb-1" />
-                    <span className="text-[1.8vw] sm:text-[1.5vw] md:text-[1.2vw] lg:text-[1vw] xl:text-[0.8vw] leading-tight">
-                      GERANDO SENHA...
+                    <Loader2 className="h-[4vw] w-[4vw] animate-spin mb-1" />
+                    <span className="text-[2.5vw] leading-tight">
+                      GERANDO...
                     </span>
                   </div>
                 ) : (
                   <div className="text-center leading-tight">
-                    <div className="text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw]">
-                      CONFIRMAR E
-                    </div>
-                    <div className="text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw]">
-                      IMPRIMIR SENHA
+                    <div className="text-[3.5vw]">
+                      CONFIRMAR
                     </div>
                   </div>
                 )}
               </Button>
             </div>
 
-            <p className="text-center text-[1.3vw] sm:text-[1vw] md:text-[0.8vw] lg:text-[0.7vw] xl:text-[0.6vw] font-black text-muted-foreground">
+            <p className="text-center text-[2vw] font-black text-muted-foreground">
               Ao confirmar, aguarde a impressão da sua senha.
             </p>
           </div>

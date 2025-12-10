@@ -3,14 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Monitor, 
-  Tv, 
-  Settings, 
-  Stethoscope, 
-  Users,
-  ExternalLink 
+import {
+  Monitor,
+  Tv,
+  Settings,
+  Stethoscope,
+  ExternalLink,
+  Info
 } from 'lucide-react';
+import { TotemHeader } from '@/components/TotemHeader';
 
 export const TesteStakeholders = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export const TesteStakeholders = () => {
     {
       id: 'totem',
       titulo: 'TOTEM',
-      subtitulo: 'Interface do Paciente',
+      subtitulo: 'Paciente',
       descricao: 'Fluxo completo: identificação, prioridade e confirmação',
       rota: '/',
       icone: Monitor,
@@ -29,7 +30,7 @@ export const TesteStakeholders = () => {
     {
       id: 'medico',
       titulo: 'MÉDICO',
-      subtitulo: 'Interface Profissional',
+      subtitulo: 'Profissional',
       descricao: 'Gestão de filas, chamada de pacientes e atendimentos',
       rota: '/medico',
       icone: Stethoscope,
@@ -39,7 +40,7 @@ export const TesteStakeholders = () => {
     {
       id: 'tv',
       titulo: 'TV',
-      subtitulo: 'Painel de Chamadas',
+      subtitulo: 'Painel',
       descricao: 'Exibição pública de chamadas com senhas e salas',
       rota: '/tv',
       icone: Tv,
@@ -49,7 +50,7 @@ export const TesteStakeholders = () => {
     {
       id: 'admin',
       titulo: 'ADMIN',
-      subtitulo: 'Painel Administrativo',
+      subtitulo: 'Gestão',
       descricao: 'Alocação de médicos, gestão de salas e configurações',
       rota: '/admin',
       icone: Settings,
@@ -59,117 +60,58 @@ export const TesteStakeholders = () => {
   ];
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <div className="flex-none p-2">
-        <div className="text-center">
-          <h1 className="text-xl font-black text-gray-800 mb-1">
-            NGA - TESTES STAKEHOLDERS
+    <div className="min-h-screen flex flex-col bg-background">
+      <TotemHeader />
+
+      <main className="flex-1 flex flex-col p-[2vw] overflow-hidden">
+        <div className="text-center mb-[2vh]">
+          <h1 className="text-[5vw] font-black text-foreground mb-[1vh]">
+            NGA - TESTES
           </h1>
-          <p className="text-sm text-gray-600">
-            Ambiente de testes - <strong>Núcleo de Gestão Ambulatorial</strong>
+          <p className="text-[2.5vw] text-muted-foreground font-medium">
+            Selecione a interface para testar
           </p>
         </div>
-      </div>
 
-      {/* Content Area */}
-      <div className="flex-1 overflow-hidden px-2 pb-2">
-        <div className="h-full flex flex-col gap-2 max-w-7xl mx-auto">
-          
-          {/* Cards das Interfaces */}
-          <div className="flex-1 grid grid-cols-2 gap-2">
-            {telas.map(({ id, titulo, subtitulo, descricao, rota, icone: Icone, cor, badge }) => (
-              <Card key={id} className="flex flex-col shadow-md hover:shadow-lg transition-all duration-300 border hover:border-blue-200 bg-white">
-                <CardHeader className="pb-1">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-base font-bold text-gray-800 leading-tight">
-                        {titulo}
-                      </CardTitle>
-                      <p className="text-xs text-gray-500 font-medium">{subtitulo}</p>
-                    </div>
-                    <Badge variant="secondary" className="text-xs">
-                      {badge}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col justify-between space-y-2 py-2">
-                  <div className="flex items-start gap-2">
-                    <div className="p-1 bg-gray-100 rounded shrink-0">
-                      <Icone className="w-3 h-3 text-gray-600" />
-                    </div>
-                    <p className="text-xs text-gray-600 leading-tight">
-                      {descricao}
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <Button 
-                      onClick={() => navigate(rota)}
-                      className={`w-full text-xs font-bold py-1.5 ${cor} text-white transition-all duration-200`}
-                      size="sm"
-                    >
-                      <ExternalLink className="w-3 h-3 mr-1" />
-                      ABRIR {titulo}
-                    </Button>
-                    
-                    <div className="text-center">
-                      <Badge variant="outline" className="text-xs py-0">
-                        {rota}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        <div className="flex-1 grid grid-cols-1 gap-[2vh]">
+          {telas.map(({ id, titulo, subtitulo, descricao, rota, icone: Icone, cor, badge }) => (
+            <Card key={id} className="flex flex-row items-center p-[2vw] shadow-md hover:shadow-xl transition-all duration-300 border-4 hover:border-primary/50 bg-card cursor-pointer" onClick={() => navigate(rota)}>
+              <div className={`p-[3vw] rounded-2xl ${cor.split(' ')[0]} mr-[3vw]`}>
+                <Icone className="w-[8vw] h-[8vw] text-white" />
+              </div>
 
-          {/* Instruções Ultra Compactas */}
-          <div className="flex-none">
-            <Card className="bg-white shadow-md">
-              <CardHeader className="pb-1">
-                <CardTitle className="text-sm font-bold text-gray-800 text-center flex items-center justify-center gap-2">
-                  📋 Instruções
-                  <Badge variant="outline" className="text-xs py-0">
-                    <Users className="w-2 h-2 mr-1" />
-                    Testes
+              <div className="flex-1">
+                <div className="flex items-center gap-[2vw] mb-[0.5vh]">
+                  <h2 className="text-[4vw] font-black text-foreground leading-none">
+                    {titulo}
+                  </h2>
+                  <Badge variant="secondary" className="text-[2vw] px-[2vw] py-[0.5vh]">
+                    {badge}
                   </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="py-2">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <h3 className="text-xs font-semibold text-gray-700 mb-1">
-                      🎯 Fluxo:
-                    </h3>
-                    <ol className="list-decimal list-inside space-y-0 text-xs text-gray-600 leading-tight">
-                      <li><strong>TOTEM</strong> → <strong>MÉDICO</strong> → <strong>TV</strong> → <strong>ADMIN</strong></li>
-                      <li>Use dados fictícios nos testes</li>
-                    </ol>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-xs font-semibold text-gray-700 mb-1">
-                      ⚠️ Atenção:
-                    </h3>
-                    <ul className="list-disc list-inside space-y-0 text-xs text-gray-600 leading-tight">
-                      <li>Teste responsividade</li>
-                      <li>Anote feedback para melhorias</li>
-                    </ul>
-                  </div>
                 </div>
-                
-                <div className="mt-1 text-center">
-                  <div className="inline-flex items-center gap-1 text-gray-500 text-xs">
-                    <Monitor className="w-2 h-2" />
-                    <span>Página temporária para testes</span>
-                  </div>
-                </div>
-              </CardContent>
+                <p className="text-[2.5vw] text-muted-foreground font-medium leading-tight">
+                  {subtitulo}
+                </p>
+              </div>
+
+              <ExternalLink className="w-[6vw] h-[6vw] text-muted-foreground/50 ml-[2vw]" />
             </Card>
+          ))}
+        </div>
+
+        <div className="mt-[2vh] p-[2vw] bg-muted/30 rounded-2xl border-2 border-dashed border-muted-foreground/30">
+          <div className="flex items-start gap-[2vw]">
+            <Info className="w-[5vw] h-[5vw] text-blue-500 mt-[0.5vh]" />
+            <div className="text-[2.2vw] text-muted-foreground">
+              <p className="font-bold mb-[0.5vh]">Instruções Rápidas:</p>
+              <p>1. O fluxo ideal é: <strong>TOTEM</strong> → <strong>MÉDICO</strong> → <strong>TV</strong>.</p>
+              <p>2. Use o <strong>TOTEM</strong> para gerar senhas.</p>
+              <p>3. Use o <strong>MÉDICO</strong> para chamar as senhas.</p>
+              <p>4. Veja o resultado na <strong>TV</strong>.</p>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

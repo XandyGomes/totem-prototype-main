@@ -11,19 +11,19 @@ const SelecionarPrioridade = () => {
 
   const handleSelecionarPrioridade = (tipo: TipoPrioridade) => {
     const prioridade = tiposPrioridade[tipo];
-    
-    dispatch({ 
-      type: 'SET_PRIORIDADE', 
-      payload: { 
+
+    dispatch({
+      type: 'SET_PRIORIDADE',
+      payload: {
         isPrioritario: true,
         prioridadeSelecionada: {
           tipo,
           descricao: prioridade.descricao,
           nivel: prioridade.nivel
         }
-      } 
+      }
     });
-    
+
     navigate("/confirmacao");
   };
 
@@ -46,39 +46,39 @@ const SelecionarPrioridade = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <TotemHeader />
-      
-      <main className="flex-1 flex items-center justify-center p-[0.5vw] overflow-auto">
-        <Card className="w-[96vw] h-[81vh] flex flex-col p-[1.5vw] shadow-xl">
-          
-          <div className="text-center mb-[2vh]">
-            <h1 className="text-[3.5vw] sm:text-[3vw] md:text-[2.5vw] lg:text-[2vw] xl:text-[1.8vw] font-black mb-[1vh] text-foreground">
+
+      <main className="flex-1 flex items-center justify-center p-[0.5vw] overflow-hidden">
+        <Card className="w-[96vw] h-[76vh] flex flex-col p-[1.5vw] shadow-xl">
+
+          <div className="text-center mb-[1vh] flex-none">
+            <h1 className="text-[4vw] font-black mb-[0.5vh] text-foreground leading-tight">
               SELECIONE SEU TIPO DE ATENDIMENTO PREFERENCIAL
             </h1>
-            
-            <p className="text-[1.8vw] sm:text-[1.5vw] md:text-[1.2vw] lg:text-[1vw] xl:text-[0.8vw] text-muted-foreground font-medium">
+
+            <p className="text-[2vw] text-muted-foreground font-medium">
               Escolha apenas se você se enquadra em uma das categorias abaixo
             </p>
           </div>
 
-          <div className="flex-1 overflow-y-auto space-y-[2vh] max-w-[85vw] mx-auto w-full">
-            
+          <div className="flex-1 flex flex-col gap-[1vh] min-h-0">
+
             {/* Superprioridade */}
-            <div className="text-center">
-              <h2 className="text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-bold text-red-600 mb-[1vh]">
+            <div className="text-center flex-none">
+              <h2 className="text-[3vw] font-bold text-red-600 mb-[0.5vh]">
                 SUPERPRIORIDADE
               </h2>
-              
+
               <div className="flex justify-center">
                 {superPrioridade.map(({ tipo, cor }) => (
                   <Button
                     key={tipo}
                     onClick={() => handleSelecionarPrioridade(tipo)}
                     size="lg"
-                    className={`w-[70vw] max-w-[600px] h-[8vh] text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-bold border-2 shadow-lg ${cor} mb-[1vh] flex items-center justify-center gap-[2vw] px-[2vw]`}
+                    className={`w-full max-w-[90vw] h-[9vh] text-[3.5vw] font-bold border-4 shadow-lg ${cor} flex items-center justify-center gap-[2vw] px-[2vw] rounded-xl`}
                   >
-                    <IconePrioridade 
+                    <IconePrioridade
                       tipo={tipo}
-                      className="w-[3vw] h-[3vw] sm:w-[2.5vw] sm:h-[2.5vw] md:w-[2vw] md:h-[2vw] lg:w-[1.5vw] lg:h-[1.5vw] xl:w-[1.2vw] xl:h-[1.2vw]" 
+                      className="w-[6vw] h-[6vw]"
                     />
                     <span className="text-white text-center">
                       {tiposPrioridade[tipo].descricao}
@@ -89,24 +89,23 @@ const SelecionarPrioridade = () => {
             </div>
 
             {/* Atendimento Preferencial Legal */}
-            <div className="text-center">
-              <h2 className="text-[2.2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] font-bold text-orange-600 mb-[1vh]">
+            <div className="text-center flex-1 flex flex-col min-h-0">
+              <h2 className="text-[3vw] font-bold text-orange-600 mb-[1vh] flex-none">
                 ATENDIMENTO PREFERENCIAL LEGAL
               </h2>
-              
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-[1vh] justify-items-center">
+
+              <div className="grid grid-cols-2 gap-[1.2vh] justify-items-center flex-1">
                 {prioridadeLegal.map(({ tipo, cor }) => (
                   <Button
                     key={tipo}
                     onClick={() => handleSelecionarPrioridade(tipo)}
-                    size="lg"
-                    className={`w-[70vw] xl:w-[32vw] max-w-[500px] h-[7vh] text-[2vw] sm:text-[1.6vw] md:text-[1.3vw] lg:text-[1vw] xl:text-[0.9vw] font-medium border-2 shadow-lg ${cor} flex items-center justify-center gap-[2vw] px-[2vw]`}
+                    className={`w-full h-full text-[2.2vw] font-bold border-2 shadow-lg ${cor} flex items-center justify-center gap-[1vw] px-[1vw] leading-tight rounded-xl py-0.5`}
                   >
-                    <IconePrioridade 
+                    <IconePrioridade
                       tipo={tipo}
-                      className="w-[2.5vw] h-[2.5vw] sm:w-[2vw] sm:h-[2vw] md:w-[1.8vw] md:h-[1.8vw] lg:w-[1.3vw] lg:h-[1.3vw] xl:w-[1.1vw] xl:h-[1.1vw]" 
+                      className="w-[5vw] h-[5vw] flex-shrink-0"
                     />
-                    <span className="text-white text-center">
+                    <span className="text-white text-center whitespace-normal leading-none">
                       {tiposPrioridade[tipo].descricao}
                     </span>
                   </Button>
@@ -115,12 +114,12 @@ const SelecionarPrioridade = () => {
             </div>
           </div>
 
-          <div className="flex justify-center mt-[2vh]">
+          <div className="flex justify-center mt-[1vh] flex-none mb-[1vh]">
             <Button
               onClick={() => navigate("/prioridade")}
               variant="outline"
               size="lg"
-              className="w-[40vw] max-w-[300px] h-[7vh] text-[2.5vw] sm:text-[2vw] md:text-[1.8vw] lg:text-[1.5vw] xl:text-[1.2vw] font-black border-4 shadow-lg bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground"
+              className="w-[50vw] h-[8vh] text-[3vw] font-black border-4 shadow-lg bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground rounded-xl"
             >
               VOLTAR
             </Button>
