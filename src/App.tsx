@@ -29,7 +29,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <div className="min-h-screen bg-gray-900 p-4 flex items-center justify-center">
-          <div className="w-full max-w-7xl h-[95vh] bg-background rounded-3xl shadow-[0_0_60px_rgba(0,0,0,0.8),inset_0_0_0_12px_#1a1a1a,inset_0_0_0_16px_#2a2a2a] overflow-hidden flex flex-col">
+          <div className="h-[95vh] aspect-[9/16] bg-background rounded-[2rem] shadow-[0_0_60px_rgba(0,0,0,0.8),inset_0_0_0_12px_#1a1a1a,inset_0_0_0_16px_#2a2a2a] overflow-hidden flex flex-col relative border-8 border-gray-900">
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Welcome />} />
