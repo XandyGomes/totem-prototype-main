@@ -14,6 +14,7 @@ import CpfInvalido from "./pages/CpfInvalido";
 import FalhaImpressao from "./pages/FalhaImpressao";
 import ConsultaNaoEncontrada from "./pages/ConsultaNaoEncontrada";
 import SetorIncorreto from "./pages/SetorIncorreto";
+import ImpressaoConcluida from "./pages/ImpressaoConcluida";
 import PaginaMedico from "./pages/PaginaMedico";
 import PaginaTV from "./pages/PaginaTV";
 import { PaginaAdministrativa } from "./pages/PaginaAdministrativa";
@@ -42,6 +43,7 @@ const App = () => (
                 <Route path="/consulta-nao-encontrada" element={<ConsultaNaoEncontrada />} />
                 <Route path="/setor-incorreto" element={<SetorIncorreto />} />
                 <Route path="/falha-impressao" element={<FalhaImpressao />} />
+                <Route path="/impressao-concluida" element={<ImpressaoConcluida />} />
                 <Route path="/medico" element={<PaginaMedico />} />
                 <Route path="/tv" element={<PaginaTV />} />
                 <Route path="/admin" element={<PaginaAdministrativa />} />
