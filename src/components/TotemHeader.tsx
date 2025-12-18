@@ -15,7 +15,7 @@ export const TotemHeader = () => {
           <img
             src="/prefeitura-franca.png"
             alt="Prefeitura de Franca"
-            className="w-[36vw] h-[15vh] sm:w-[32vw] sm:h-[14vh] md:w-[28vw] md:h-[13vh] lg:w-[24vw] lg:h-[12vh] object-contain"
+            className="w-[36vw] h-[15vh] sm:w-[32vw] sm:h-[14vh] md:w-[28vw] md:h-[13vh] lg:w-[24vw] lg:h-[12vh] object-contain blur-md"
           />
         </div>
       </div>
