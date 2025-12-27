@@ -24,24 +24,22 @@ const TicketImpresso = () => {
     const sala = consulta?.sala || "A definir";
 
     // Lógica para cor da linha (reutilizada de Confirmacao)
-    const setor = mockSetores.find(s =>
+    const setor = senhaGerada?.setor || mockSetores.find(s =>
         s.nome.toLowerCase() === (consulta?.setor || "").toLowerCase()
     ) || mockSetores[0];
 
-    const getLineName = (cor: string) => {
+    const getLineName = (corNome: string) => {
         const lineNames: { [key: string]: string } = {
-            '#FF0000': 'LINHA VERMELHA',
-            '#00FF00': 'LINHA VERDE',
-            '#0000FF': 'LINHA AZUL',
-            '#FFFF00': 'LINHA AMARELA',
-            '#FF00FF': 'LINHA ROSA',
-            '#800080': 'LINHA ROXA',
-            '#FFA500': 'LINHA LARANJA'
+            'verde': 'LINHA VERDE',
+            'amarelo': 'LINHA AMARELA',
+            'azul': 'LINHA AZUL',
+            'violeta': 'LINHA VIOLETA',
+            'laranja': 'LINHA LARANJA'
         };
-        return lineNames[cor] || 'LINHA CINZA';
+        return lineNames[corNome] || 'LINHA CINZA';
     };
 
-    const lineName = getLineName(setor.cor);
+    const lineName = getLineName(setor.corNome);
 
     return createPortal(
         <div
@@ -77,13 +75,13 @@ const TicketImpresso = () => {
                 <p className="text-lg font-black uppercase mt-2">
                     {setorNome}
                 </p>
-                <p className="text-sm font-bold mt-1">
-                    SALA: <span className="text-xl">{sala}</span>
-                </p>
                 <div className="border-2 border-black rounded p-1 mt-2 inline-block px-4">
                     <p className="text-xs font-bold uppercase">SIGA A</p>
                     <p className="text-lg font-black uppercase">{lineName}</p>
                 </div>
+                <p className="text-[10px] font-bold mt-2 uppercase">
+                    Aguarde a chamada da sua senha no painel
+                </p>
             </div>
 
             {/* Detalhes do Medico e Paciente */}
