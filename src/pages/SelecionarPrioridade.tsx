@@ -24,7 +24,7 @@ const SelecionarPrioridade = () => {
       }
     });
 
-    navigate("/confirmacao");
+    navigate("/welcome/confirmacao");
   };
 
   // Grupos de prioridades
@@ -116,7 +116,7 @@ const SelecionarPrioridade = () => {
 
           <div className="flex justify-center mt-[1vh] flex-none mb-[1vh]">
             <Button
-              onClick={() => navigate("/prioridade")}
+              onClick={() => navigate("/welcome/prioridade")}
               variant="outline"
               size="lg"
               className="w-[50vw] h-[8vh] text-[3vw] font-black border-4 shadow-lg bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground rounded-xl"

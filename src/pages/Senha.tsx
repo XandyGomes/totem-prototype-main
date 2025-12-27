@@ -13,13 +13,11 @@ const Senha = () => {
     // Um pequeno delay garante que o React renderizou o componente ticket
     const printTimer = setTimeout(() => {
       window.print();
-    }, 500);
+    }, 800);
 
-    // Timer para ir automaticamente para a tela de impressão concluída após 3 segundos
-    // Aumentei um pouco para dar tempo do print dialog (se houver) ou processamento
     const navTimer = setTimeout(() => {
-      navigate("/impressao-concluida");
-    }, 4000);
+      navigate("/welcome/impressao-concluida");
+    }, 5000);
 
     return () => {
       clearTimeout(printTimer);

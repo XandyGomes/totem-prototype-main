@@ -9,6 +9,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { IconePrioridade } from "@/components/IconePrioridade";
+import { adicionarPacienteNaFila } from "@/services/filaService";
 
 const Confirmacao = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const Confirmacao = () => {
 
   // Se não tem consulta, redireciona para identificação
   if (!state.consulta) {
-    navigate("/identificacao");
+    navigate("/welcome/identificacao");
     return null;
   }
 
@@ -35,38 +36,34 @@ const Confirmacao = () => {
   ) || mockSetores[0];
 
   // Função para obter cores baseadas no setor
-  const getLineColors = (cor: string) => {
+  const getLineColors = (corNome: string) => {
     const colorMap: { [key: string]: { bg: string; border: string; text: string } } = {
-      '#FF0000': { bg: "bg-red-100", border: "border-red-500", text: "text-red-800" },
-      '#00FF00': { bg: "bg-green-100", border: "border-green-500", text: "text-green-800" },
-      '#0000FF': { bg: "bg-blue-100", border: "border-blue-500", text: "text-blue-800" },
-      '#FFFF00': { bg: "bg-yellow-100", border: "border-yellow-500", text: "text-yellow-800" },
-      '#FF00FF': { bg: "bg-pink-100", border: "border-pink-500", text: "text-pink-800" },
-      '#800080': { bg: "bg-purple-100", border: "border-purple-500", text: "text-purple-800" },
-      '#FFA500': { bg: "bg-orange-100", border: "border-orange-500", text: "text-orange-800" }
+      'verde': { bg: "bg-green-100", border: "border-green-500", text: "text-green-800" },
+      'amarelo': { bg: "bg-yellow-100", border: "border-yellow-500", text: "text-yellow-800" },
+      'azul': { bg: "bg-blue-100", border: "border-blue-500", text: "text-blue-800" },
+      'violeta': { bg: "bg-purple-100", border: "border-purple-500", text: "text-purple-800" },
+      'laranja': { bg: "bg-orange-100", border: "border-orange-500", text: "text-orange-800" }
     };
 
-    return colorMap[cor] || { bg: "bg-gray-100", border: "border-gray-500", text: "text-gray-800" };
+    return colorMap[corNome] || { bg: "bg-gray-100", border: "border-gray-500", text: "text-gray-800" };
   };
 
-  const lineColors = getLineColors(setor.cor);
+  const lineColors = getLineColors(setor.corNome);
 
-  // Determina o nome da linha baseado na cor
-  const getLineName = (cor: string) => {
+  // Determina o nome da linha baseado na corNome
+  const getLineName = (corNome: string) => {
     const lineNames: { [key: string]: string } = {
-      '#FF0000': 'LINHA VERMELHA',
-      '#00FF00': 'LINHA VERDE',
-      '#0000FF': 'LINHA AZUL',
-      '#FFFF00': 'LINHA AMARELA',
-      '#FF00FF': 'LINHA ROSA',
-      '#800080': 'LINHA ROXA',
-      '#FFA500': 'LINHA LARANJA'
+      'verde': 'LINHA VERDE',
+      'amarelo': 'LINHA AMARELA',
+      'azul': 'LINHA AZUL',
+      'violeta': 'LINHA VIOLETA',
+      'laranja': 'LINHA LARANJA'
     };
 
-    return lineNames[cor] || 'LINHA CINZA';
+    return lineNames[corNome] || 'LINHA CINZA';
   };
 
-  const lineName = getLineName(setor.cor);
+  const lineName = getLineName(setor.corNome);
 
   const handleConfirm = async () => {
     setIsGenerating(true);
@@ -93,13 +90,35 @@ const Confirmacao = () => {
           hour: '2-digit',
           minute: '2-digit'
         }),
-        prioridade
+        prioridade,
+        setor,
+        sala: consulta.sala || 'A definir'
       };
 
       // Salva senha no contexto
       dispatch({ type: 'SET_SENHA_GERADA', payload: senhaGerada });
 
-      // Adiciona à fila
+      console.log('📡 Chamando adicionarPacienteNaFila (Supabase)...');
+
+      // Adiciona à fila persistente no Supabase
+      try {
+        await adicionarPacienteNaFila({
+          consulta,
+          prioridade,
+          senha: senhaGerada,
+          horarioChegada: new Date().toISOString()
+        });
+        console.log('✅ Paciente salvo no Supabase com sucesso.');
+      } catch (e) {
+        console.error('❌ Falha ao salvar no Supabase:', e);
+        toast({
+          title: "Erro de Sincronização",
+          description: "Sua senha foi gerada, mas houve um erro ao sincronizar com o painel médico.",
+          variant: "destructive"
+        });
+      }
+
+      // Adiciona à fila do contexto local (opcional, para UI local imediata)
       dispatch({
         type: 'ADD_TO_FILA',
         payload: {
@@ -120,7 +139,7 @@ const Confirmacao = () => {
       });
 
       if (!resultadoImpressao.sucesso) {
-        navigate("/falha-impressao");
+        navigate("/welcome/falha-impressao");
         return;
       }
 
@@ -130,7 +149,7 @@ const Confirmacao = () => {
         duration: 3000,
       });
 
-      navigate("/senha");
+      navigate("/welcome/senha");
 
     } catch (error) {
       console.error('Erro ao gerar senha:', error);
@@ -167,61 +186,49 @@ const Confirmacao = () => {
 
           <div className="flex-1 flex flex-col justify-center gap-[2vh]">
             <Card className="w-full p-[2vw] bg-muted/50 border-4 rounded-2xl shadow-inner">
-              <div className="flex flex-col gap-[2vh]">
-                <div className="flex flex-row gap-[2vw]">
-                  <div className="flex-1 space-y-[1.5vh] text-[3vw] leading-tight">
+              <div className="flex flex-col gap-[1vh]">
+                <div className="flex-1 space-y-[2vh] text-[3.5vw] leading-tight p-[1vw]">
 
-                    <div className="break-words">
-                      <span className="font-black text-muted-foreground block text-[2.2vw]">PACIENTE</span>
-                      <span className="font-bold text-foreground">{consulta.paciente.nome}</span>
-                    </div>
+                  <div className="break-words">
+                    <span className="text-[2.2vw] font-black uppercase text-muted-foreground block">PACIENTE</span>
+                    <span className="font-bold text-foreground text-[4vw]">{consulta.paciente.nome}</span>
+                  </div>
 
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <span className="font-black text-muted-foreground block text-[2.2vw]">DATA E HORA</span>
+                      <span className="text-[2.2vw] font-black uppercase text-muted-foreground block">DATA E HORA</span>
                       <span className="font-bold text-foreground">{formatDate(consulta.data)} às {consulta.hora}</span>
                     </div>
-
                     <div className="break-words">
-                      <span className="font-black text-muted-foreground block text-[2.2vw]">ESPECIALIDADE/MÉDICO</span>
-                      <span className="font-bold text-foreground">{consulta.medico.especialidade}</span>
-                      <div className="text-[2.5vw] text-foreground/80">{consulta.medico.nome}</div>
-                    </div>
-
-                    <div className="break-words">
-                      <span className="font-black text-muted-foreground block text-[2.2vw]">SETOR</span>
-                      <span className="font-bold text-foreground">{setor.nome}</span>
-                    </div>
-
-                    <div>
-                      <span className="font-black text-muted-foreground block text-[2.2vw]">ATENDIMENTO</span>
-                      <Badge variant="outline" className="font-bold inline-flex items-center gap-2 px-3 py-1 text-[2.5vw] h-auto border-2 mt-1">
-                        <IconePrioridade tipo={prioridade.tipo} className="w-[4vw] h-[4vw]" />
-                        {prioridade.descricao}
-                      </Badge>
+                      <span className="text-[2.2vw] font-black uppercase text-muted-foreground block">SETOR</span>
+                      <span className="font-bold text-foreground uppercase">{setor.nome}</span>
                     </div>
                   </div>
 
-                  <Card className={`min-w-[30%] bg-background border-4 flex flex-col items-center justify-center p-[1vw] shadow-sm ${lineColors.border} rounded-xl self-start`}>
-                    <span className="text-[2.5vw] font-black text-muted-foreground uppercase mb-1">
-                      SALA
-                    </span>
-                    <span className={`text-[12vw] font-black ${lineColors.text} leading-none`}>
-                      {consulta.sala || '--'}
-                    </span>
-                    {!consulta.sala && (
-                      <span className="text-[2vw] text-center font-bold text-muted-foreground leading-tight mt-1">
-                        A definir
-                      </span>
-                    )}
-                  </Card>
+                  <div className="break-words">
+                    <span className="text-[2.2vw] font-black uppercase text-muted-foreground block">ESPECIALIDADE / MÉDICO</span>
+                    <div className="flex flex-col">
+                      <span className="font-bold text-foreground">{consulta.medico.especialidade}</span>
+                      <span className="text-[2.8vw] text-foreground/70 font-bold uppercase">{consulta.medico.nome}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-[2.2vw] font-black uppercase text-muted-foreground block mb-1">TIPO DE ATENDIMENTO</span>
+                    <Badge variant="outline" className="font-black inline-flex items-center gap-3 px-6 py-2 text-[3vw] h-auto border-4 mt-1 bg-white">
+                      <IconePrioridade tipo={prioridade.tipo} className="w-[5vw] h-[5vw]" />
+                      {prioridade.descricao}
+                    </Badge>
+                  </div>
                 </div>
               </div>
 
-              <div className={`text-center p-[2vh] rounded-xl border-4 ${lineColors.bg} ${lineColors.border} mt-[3vh]`}>
-                <div className={`font-black ${lineColors.text} text-[4vw] leading-none`}>
+              <div className={`text-center p-[3vh] rounded-[2rem] border-[6px] shadow-lg ${lineColors.bg} ${lineColors.border} mt-[2vh]`}>
+                <div className="text-[2.5vw] font-black text-muted-foreground uppercase mb-1">Instrução de Caminho</div>
+                <div className={`font-black ${lineColors.text} text-[6vw] leading-none tracking-tighter`}>
                   SIGA A: {lineName}
                 </div>
-                <div className={`font-medium ${lineColors.text} text-[2.5vw] mt-[0.5vh]`}>
+                <div className={`font-bold ${lineColors.text} text-[3vw] mt-1 uppercase`}>
                   Direção: {setor.nome}
                 </div>
               </div>
@@ -231,7 +238,7 @@ const Confirmacao = () => {
           <div className="mt-[2vh]">
             <div className="flex flex-row gap-[2vw] mb-[2vh]">
               <Button
-                onClick={() => navigate(state.isPrioritario ? "/selecionar-prioridade" : "/prioridade")}
+                onClick={() => navigate(state.isPrioritario ? "/welcome/selecionar-prioridade" : "/welcome/prioridade")}
                 variant="outline"
                 size="lg"
                 disabled={isGenerating}

@@ -1,4 +1,5 @@
-import { Consulta, PrioridadeSelecionada, SenhaGerada, Medico } from '@/contexts/TotemContext';
+import { supabase } from '@/lib/supabase';
+import { Consulta, PrioridadeSelecionada, SenhaGerada, Medico, mockSetores } from '@/contexts/TotemContext';
 
 export interface PacienteFila {
   id: string;
@@ -9,319 +10,224 @@ export interface PacienteFila {
   status: 'aguardando' | 'chamando' | 'em_atendimento' | 'atendido';
 }
 
-export interface FilaEspecialidade {
-  especialidade: string;
-  pacientes: PacienteFila[];
-}
-
-export interface FilaMedico {
-  medico: Medico;
-  pacientes: PacienteFila[];
-}
-
-// Interface para alocação de médicos (integração com painel administrativo)
-export interface MedicoAlocacao {
-  id: string;
-  medicoId: string;
-  nomeMedico: string;
-  especialidade: string;
-  sala: string;
-  setor: string;
-  data: string;
-  turno: 'manhã' | 'tarde' | 'noite';
-  computadorId?: string;
-}
-
-// Função para obter alocações do localStorage
-const obterAlocacoesMedicos = (): MedicoAlocacao[] => {
-  const alocacoes = localStorage.getItem('medicosAlocacoes');
-  return alocacoes ? JSON.parse(alocacoes) : [];
-};
-
-// Função para detectar sala atual do médico automaticamente
-export const detectarSalaMedico = (medicoId: string): { sala: string; setor: string } | null => {
-  const hoje = new Date().toISOString().split('T')[0];
-  const horaAtual = new Date().getHours();
-  
-  // Determina o turno atual
-  let turnoAtual: 'manhã' | 'tarde' | 'noite';
-  if (horaAtual >= 6 && horaAtual < 12) {
-    turnoAtual = 'manhã';
-  } else if (horaAtual >= 12 && horaAtual < 18) {
-    turnoAtual = 'tarde';
-  } else {
-    turnoAtual = 'noite';
-  }
-  
-  const alocacoes = obterAlocacoesMedicos();
-  const alocacaoAtual = alocacoes.find(a => 
-    a.medicoId === medicoId && 
-    a.data === hoje && 
-    a.turno === turnoAtual
-  );
-  
-  if (alocacaoAtual) {
-    return {
-      sala: alocacaoAtual.sala,
-      setor: alocacaoAtual.setor
-    };
-  }
-  
-  // Se não encontrar alocação, tenta detectar por computador
-  const computadorId = detectarComputadorAtual();
-  if (computadorId) {
-    const alocacaoPorComputador = alocacoes.find(a => 
-      a.medicoId === medicoId && 
-      a.computadorId === computadorId &&
-      a.data === hoje
-    );
-    
-    if (alocacaoPorComputador) {
-      return {
-        sala: alocacaoPorComputador.sala,
-        setor: alocacaoPorComputador.setor
-      };
-    }
-  }
-  
-  return null;
-};
-
-// Simula detecção do computador atual (seria implementado com lógica real)
-const detectarComputadorAtual = (): string | null => {
-  // Em um ambiente real, isso detectaria o ID do computador pela rede
-  // Por enquanto, simulamos retornando um ID baseado no hostname
-  try {
-    const hostname = window.location.hostname;
-    if (hostname.includes('nga-pc-01')) return 'NGA-PC-01';
-    if (hostname.includes('nga-pc-02')) return 'NGA-PC-02';
-    // ... mais computadores
-    
-    // Para desenvolvimento, retorna um ID aleatório
-    const computadores = ['NGA-PC-01', 'NGA-PC-02', 'NGA-PC-03', 'NGA-PC-04'];
-    return computadores[Math.floor(Math.random() * computadores.length)];
-  } catch {
-    return null;
-  }
-};
-
-// Simulação de dados de filas para desenvolvimento
-let filasEspecialidades: FilaEspecialidade[] = [
-  {
-    especialidade: 'Cardiologia',
-    pacientes: []
-  },
-  {
-    especialidade: 'Geriatria', 
-    pacientes: []
-  },
-  {
-    especialidade: 'Ortopedia',
-    pacientes: []
-  }
-];
-
-// Adiciona paciente à fila
-export const adicionarPacienteNaFila = (pacienteFila: Omit<PacienteFila, 'id' | 'status'>): PacienteFila => {
-  const novoPaciente: PacienteFila = {
-    ...pacienteFila,
-    id: Date.now().toString(),
-    status: 'aguardando'
-  };
-
-  // Encontra a fila da especialidade
-  let filaEspecialidade = filasEspecialidades.find(f => 
-    f.especialidade === pacienteFila.consulta.medico.especialidade
-  );
-
-  // Se não existe, cria
-  if (!filaEspecialidade) {
-    filaEspecialidade = {
-      especialidade: pacienteFila.consulta.medico.especialidade,
-      pacientes: []
-    };
-    filasEspecialidades.push(filaEspecialidade);
-  }
-
-  // Adiciona o paciente na posição correta baseada na prioridade
-  const posicaoInsercao = calcularPosicaoFila(filaEspecialidade.pacientes, novoPaciente);
-  filaEspecialidade.pacientes.splice(posicaoInsercao, 0, novoPaciente);
-
-  return novoPaciente;
-};
-
-// Calcula posição correta na fila baseada na prioridade
-const calcularPosicaoFila = (filaAtual: PacienteFila[], novoPaciente: PacienteFila): number => {
-  // Prioridade 1 (superprioridade) vai sempre para o início
-  if (novoPaciente.prioridade.nivel === 1) {
-    // Encontra a primeira posição após outros de superprioridade
-    const ultimaSuperPrioridade = filaAtual.findIndex(p => p.prioridade.nivel !== 1);
-    return ultimaSuperPrioridade === -1 ? filaAtual.length : ultimaSuperPrioridade;
-  }
-
-  // Prioridade 2 vai após superprioridade mas antes dos comuns
-  if (novoPaciente.prioridade.nivel === 2) {
-    const ultimaPrioridade = filaAtual.findIndex(p => p.prioridade.nivel === 3);
-    return ultimaPrioridade === -1 ? filaAtual.length : ultimaPrioridade;
-  }
-
-  // Prioridade 3 (comum) vai para o final
-  return filaAtual.length;
-};
-
-// Obtém fila do médico específico
-export const obterFilaMedico = (medicoId: string): FilaMedico | null => {
-  const todasFilas = filasEspecialidades.flatMap(f => f.pacientes);
-  const pacientesMedico = todasFilas.filter(p => p.consulta.medico.id === medicoId);
-  
-  if (pacientesMedico.length === 0) return null;
-
-  return {
-    medico: pacientesMedico[0].consulta.medico,
-    pacientes: pacientesMedico
-  };
-};
-
-// Obtém próximo paciente da fila do médico
-export const obterProximoPaciente = (medicoId: string): PacienteFila | null => {
-  const filaMedico = obterFilaMedico(medicoId);
-  if (!filaMedico) return null;
-
-  const proximoPaciente = filaMedico.pacientes
-    .filter(p => p.status === 'aguardando')
-    .sort((a, b) => {
-      // Ordena por prioridade primeiro
-      if (a.prioridade.nivel !== b.prioridade.nivel) {
-        return a.prioridade.nivel - b.prioridade.nivel;
-      }
-      // Se mesma prioridade, ordena por horário de chegada
-      return new Date(a.horarioChegada).getTime() - new Date(b.horarioChegada).getTime();
-    })[0];
-
-  return proximoPaciente || null;
-};
-
-// Chama paciente
-export const chamarPaciente = (pacienteId: string): boolean => {
-  const paciente = encontrarPacientePorId(pacienteId);
-  if (!paciente || paciente.status !== 'aguardando') return false;
-
-  paciente.status = 'chamando';
-  
-  // Detecta automaticamente a sala do médico
-  const localizacao = detectarSalaMedico(paciente.consulta.medico.id);
-  
-  // Simula broadcast para TVs
-  broadcastChamada({
-    senha: paciente.senha.numero,
-    medico: paciente.consulta.medico.nome,
-    sala: localizacao?.sala || paciente.consulta.sala || 'Recepção',
-    setor: localizacao?.setor || paciente.consulta.setor,
-    prioridade: paciente.prioridade
-  });
-
-  return true;
-};
-
-// Inicia atendimento
-export const iniciarAtendimento = (pacienteId: string): boolean => {
-  const paciente = encontrarPacientePorId(pacienteId);
-  if (!paciente) return false;
-
-  paciente.status = 'em_atendimento';
-  return true;
-};
-
-// Finaliza atendimento
-export const finalizarAtendimento = (pacienteId: string): boolean => {
-  const paciente = encontrarPacientePorId(pacienteId);
-  if (!paciente) return false;
-
-  paciente.status = 'atendido';
-  return true;
-};
-
-// Força prioridade de um paciente (médico pode priorizar)
-export const priorizarPaciente = (pacienteId: string, medicoId: string): boolean => {
-  const filaMedico = obterFilaMedico(medicoId);
-  if (!filaMedico) return false;
-
-  const pacienteIndex = filaMedico.pacientes.findIndex(p => p.id === pacienteId);
-  if (pacienteIndex === -1) return false;
-
-  const paciente = filaMedico.pacientes[pacienteIndex];
-  if (paciente.status !== 'aguardando') return false;
-
-  // Remove da posição atual
-  filaMedico.pacientes.splice(pacienteIndex, 1);
-  
-  // Adiciona no início dos pacientes aguardando
-  const primeiroAguardando = filaMedico.pacientes.findIndex(p => p.status === 'aguardando');
-  const novaPosicao = primeiroAguardando === -1 ? filaMedico.pacientes.length : primeiroAguardando;
-  filaMedico.pacientes.splice(novaPosicao, 0, paciente);
-
-  return true;
-};
-
-// Funções auxiliares
-const encontrarPacientePorId = (pacienteId: string): PacienteFila | null => {
-  for (const fila of filasEspecialidades) {
-    const paciente = fila.pacientes.find(p => p.id === pacienteId);
-    if (paciente) return paciente;
-  }
-  return null;
-};
-
-// Simula broadcast para TVs
-interface ChamadaTV {
+export interface ChamadaTV {
+  id?: string;
   senha: string;
+  paciente_nome: string;
   medico: string;
   sala: string;
   setor: string;
   prioridade: PrioridadeSelecionada;
+  created_at?: string;
 }
 
-const chamadasRecentes: ChamadaTV[] = [];
+// Adiciona paciente à fila no Supabase
+export const adicionarPacienteNaFila = async (pacienteFila: Omit<PacienteFila, 'id' | 'status'>): Promise<any> => {
+  const { data, error } = await supabase
+    .from('pacientes_fila')
+    .insert([{
+      cpf: pacienteFila.consulta.paciente.cpf,
+      nome_paciente: pacienteFila.consulta.paciente.nome,
+      medico_id: pacienteFila.consulta.medico.id,
+      medico_nome: pacienteFila.consulta.medico.nome,
+      setor_id: pacienteFila.senha.setor.id,
+      setor_nome: pacienteFila.senha.setor.nome,
+      senha_numero: pacienteFila.senha.numero,
+      prioridade_tipo: pacienteFila.prioridade.tipo,
+      prioridade_nivel: pacienteFila.prioridade.nivel,
+      status: 'aguardando'
+    }])
+    .select();
 
-const broadcastChamada = (chamada: ChamadaTV) => {
-  chamadasRecentes.unshift(chamada);
-  // Mantém apenas as 10 chamadas mais recentes
-  if (chamadasRecentes.length > 10) {
-    chamadasRecentes.splice(10);
+  if (error) {
+    console.error('Erro ao adicionar paciente no Supabase:', error);
+    throw error;
   }
-  
-  console.log('📢 Chamada enviada para TVs:', chamada);
+
+  return data[0];
 };
 
-// Obtém chamadas recentes para exibir nas TVs
-export const obterChamadasRecentes = (): ChamadaTV[] => {
-  return [...chamadasRecentes];
+// Obtém fila de um médico específico
+export const obterFilaMedico = async (medicoId: string): Promise<PacienteFila[]> => {
+  const { data, error } = await supabase
+    .from('pacientes_fila')
+    .select('*')
+    .eq('medico_id', medicoId)
+    .neq('status', 'atendido')
+    .order('prioridade_nivel', { ascending: true })
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Erro ao buscar fila do médico:', error);
+    return [];
+  }
+
+  // Mapeia o resultado do Supabase de volta para o formato PacienteFila do App
+  return data.map(item => mapDbToPacienteFila(item));
 };
 
-// Obtém todas as filas (para administradores)
-export const obterTodasFilas = (): FilaEspecialidade[] => {
-  return [...filasEspecialidades];
+// Chama paciente e envia para a TV
+export const chamarPaciente = async (pacienteId: string, sala: string): Promise<boolean> => {
+  // 1. Atualiza status do paciente
+  const { error: errorUpdate } = await supabase
+    .from('pacientes_fila')
+    .update({ status: 'chamando' })
+    .eq('id', pacienteId);
+
+  if (errorUpdate) return false;
+
+  // 2. Busca dados para o broadcast da TV
+  const { data: paciente } = await supabase
+    .from('pacientes_fila')
+    .select('*')
+    .eq('id', pacienteId)
+    .single();
+
+  if (!paciente) return false;
+
+  // 3. Insere a chamada na tabela de chamadas da TV
+  const { error: errorTV } = await supabase
+    .from('chamadas_tv')
+    .insert([{
+      senha: paciente.senha_numero,
+      paciente_nome: paciente.nome_paciente,
+      medico: paciente.medico_nome,
+      sala: sala,
+      setor: paciente.setor_nome,
+      prioridade_tipo: paciente.prioridade_tipo
+    }]);
+
+  return !errorTV;
 };
 
-// Estatísticas da fila
-export const obterEstatisticasFila = (medicoId?: string) => {
-  let pacientes: PacienteFila[];
-  
+export const iniciarAtendimento = async (pacienteId: string): Promise<boolean> => {
+  const { error } = await supabase
+    .from('pacientes_fila')
+    .update({ status: 'em_atendimento' })
+    .eq('id', pacienteId);
+  return !error;
+};
+
+export const finalizarAtendimento = async (pacienteId: string): Promise<boolean> => {
+  const { error } = await supabase
+    .from('pacientes_fila')
+    .update({ status: 'atendido' })
+    .eq('id', pacienteId);
+  return !error;
+};
+
+// Obtém as chamadas mais recentes para a TV
+export const obterChamadasRecentes = async (): Promise<ChamadaTV[]> => {
+  const { data, error } = await supabase
+    .from('chamadas_tv')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  if (error) return [];
+
+  return data.map(item => ({
+    ...item,
+    prioridade: { tipo: item.prioridade_tipo } as any // Simplificado para a TV
+  }));
+};
+
+// Estatísticas globais (utilizado pelo médico)
+export const obterEstatisticasFila = async (medicoId?: string) => {
+  let query = supabase.from('pacientes_fila').select('status');
+
   if (medicoId) {
-    const filaMedico = obterFilaMedico(medicoId);
-    pacientes = filaMedico?.pacientes || [];
-  } else {
-    pacientes = filasEspecialidades.flatMap(f => f.pacientes);
+    query = query.eq('medico_id', medicoId);
   }
+
+  const { data, error } = await query;
+  if (error || !data) return { total: 0, aguardando: 0, chamando: 0, emAtendimento: 0, atendidos: 0 };
 
   return {
-    total: pacientes.length,
-    aguardando: pacientes.filter(p => p.status === 'aguardando').length,
-    chamando: pacientes.filter(p => p.status === 'chamando').length,
-    emAtendimento: pacientes.filter(p => p.status === 'em_atendimento').length,
-    atendidos: pacientes.filter(p => p.status === 'atendido').length,
-    superprioridade: pacientes.filter(p => p.prioridade.nivel === 1).length,
-    prioridade: pacientes.filter(p => p.prioridade.nivel === 2).length,
-    comum: pacientes.filter(p => p.prioridade.nivel === 3).length
+    total: data.length,
+    aguardando: data.filter(p => p.status === 'aguardando').length,
+    chamando: data.filter(p => p.status === 'chamando').length,
+    emAtendimento: data.filter(p => p.status === 'em_atendimento').length,
+    atendidos: data.filter(p => p.status === 'atendido').length
+  };
+};
+
+// Estatísticas detalhadas para o Painel de Gestão
+export const obterEstatisticasCompletas = async () => {
+  const { data, error } = await supabase
+    .from('pacientes_fila')
+    .select('*');
+
+  if (error || !data) return null;
+
+  const atendidos = data.filter(p => p.status === 'atendido');
+
+  // Cálculo de tempo médio de espera (em minutos)
+  const temposEspera = data
+    .filter(p => p.status !== 'aguardando')
+    .map(p => {
+      const inicio = new Date(p.created_at).getTime();
+      const fim = p.updated_at ? new Date(p.updated_at).getTime() : Date.now();
+
+      if (isNaN(inicio) || isNaN(fim)) return 0;
+      return Math.max(0, (fim - inicio) / (1000 * 60));
+    });
+
+  const tempoMedio = temposEspera.length > 0
+    ? Math.round(temposEspera.reduce((a, b) => a + b, 0) / temposEspera.length)
+    : 0;
+
+  return {
+    total: data.length,
+    aguardando: data.filter(p => p.status === 'aguardando').length,
+    emAtendimento: data.filter(p => p.status === 'em_atendimento' || p.status === 'chamando').length,
+    atendidos: atendidos.length,
+    tempoMedioEspera: `${tempoMedio} min`,
+    taxaEficiencia: atendidos.length > 0 ? `${Math.round((atendidos.length / data.length) * 100)}%` : '0%',
+    statsPorSetor: mockSetores.map(setor => {
+      const pSetor = data.filter(p => p.setor_id === setor.id);
+      return {
+        ...setor,
+        total: pSetor.length,
+        aguardando: pSetor.filter(p => p.status === 'aguardando').length,
+        atendidos: pSetor.filter(p => p.status === 'atendido').length
+      };
+    })
+  };
+};
+
+// Funções de limpeza para o Admin (Deploy Vercel precisa disso para resetar testes)
+export const resetarBancoDeDados = async () => {
+  await supabase.from('pacientes_fila').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  await supabase.from('chamadas_tv').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  return true;
+};
+
+/**
+ * Função Auxiliar: Converte os dados do Banco (SQL) para o modelo da Interface (Typescript)
+ */
+const mapDbToPacienteFila = (db: any): PacienteFila => {
+  const setor = mockSetores.find(s => s.id === db.setor_id) || mockSetores[0];
+
+  return {
+    id: db.id,
+    horarioChegada: db.created_at,
+    status: db.status,
+    prioridade: {
+      tipo: db.prioridade_tipo,
+      nivel: db.prioridade_nivel,
+      descricao: '' // Será preenchido se necessário
+    } as any,
+    senha: {
+      numero: db.senha_numero,
+      setor: setor,
+      sala: '',
+      horario: new Date(db.created_at).toLocaleTimeString()
+    } as any,
+    consulta: {
+      paciente: { nome: db.nome_paciente, cpf: db.cpf, idade: 0 },
+      medico: { id: db.medico_id, nome: db.medico_nome, especialidade: '', crm: '' },
+      setor: db.setor_nome
+    } as any
   };
 };

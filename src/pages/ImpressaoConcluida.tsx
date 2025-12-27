@@ -25,7 +25,7 @@ const ImpressaoConcluida = () => {
                         </p>
 
                         <Button
-                            onClick={() => navigate("/")}
+                            onClick={() => navigate("/welcome")}
                             size="lg"
                             className="w-full max-w-[50vw] h-[10vh] text-[4vw] font-black border-4 shadow-lg mb-[2vh] rounded-2xl bg-green-600 hover:bg-green-700 text-white border-green-700"
                         >

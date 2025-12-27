@@ -24,7 +24,7 @@ const Prioridade = () => {
         }
       }
     });
-    navigate("/confirmacao");
+    navigate("/welcome/confirmacao");
   };
 
   const handlePrioritario = () => {
@@ -34,7 +34,7 @@ const Prioridade = () => {
         isPrioritario: true
       }
     });
-    navigate("/selecionar-prioridade");
+    navigate("/welcome/selecionar-prioridade");
   };
 
   return (
@@ -208,7 +208,7 @@ const Prioridade = () => {
 
           <div className="flex justify-center mt-[2vh] flex-none mb-[1vh]">
             <Button
-              onClick={() => navigate("/identificacao")}
+              onClick={() => navigate("/welcome/identificacao")}
               variant="outline"
               size="lg"
               className="w-[50vw] h-[10vh] text-[3.5vw] font-black border-4 shadow-lg bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground rounded-2xl"

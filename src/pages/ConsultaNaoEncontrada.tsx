@@ -36,14 +36,14 @@ const ConsultaNaoEncontrada = () => {
 
           <div className="flex flex-col gap-[2vh] w-full max-w-[80vw]">
             <Button
-              onClick={() => navigate("/identificacao")}
+              onClick={() => navigate("/welcome/identificacao")}
               size="lg"
               className="w-full h-[12vh] text-[4vw] font-black border-4 shadow-lg rounded-2xl bg-orange-600 hover:bg-orange-700"
             >
               TENTAR NOVAMENTE
             </Button>
             <Button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/welcome")}
               variant="outline"
               size="lg"
               className="w-full h-[12vh] text-[4vw] font-black border-4 shadow-lg bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground rounded-2xl"

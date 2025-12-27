@@ -1,8 +1,8 @@
 import React from 'react';
-import { TotemHeader } from '../components/TotemHeader';
-import { PainelAdministrativo } from '../components/PainelAdministrativo';
+import { TotemHeader } from '@/components/TotemHeader';
+import { PainelAdministrativo } from '@/features/admin/PainelAdministrativo';
 
-export const PaginaAdministrativa: React.FC = () => {
+const PaginaAdministrativa: React.FC = () => {
   return (
     <div className="h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col overflow-hidden">
       <TotemHeader />
@@ -12,3 +12,5 @@ export const PaginaAdministrativa: React.FC = () => {
     </div>
   );
 };
+
+export default PaginaAdministrativa;

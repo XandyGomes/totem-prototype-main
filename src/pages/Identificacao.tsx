@@ -60,7 +60,7 @@ const Identificacao = () => {
             erro: resultadoConsulta.erro
           }
         });
-        navigate("/consulta-nao-encontrada");
+        navigate("/welcome/consulta-nao-encontrada");
         return;
       }
 
@@ -79,7 +79,7 @@ const Identificacao = () => {
             erro: resultadoSetor.erro
           }
         });
-        navigate("/setor-incorreto");
+        navigate("/welcome/setor-incorreto");
         return;
       }
 
@@ -98,7 +98,7 @@ const Identificacao = () => {
         duration: 2000,
       });
 
-      navigate("/prioridade");
+      navigate("/welcome/prioridade");
 
     } catch (error) {
       console.error('Erro na validação:', error);

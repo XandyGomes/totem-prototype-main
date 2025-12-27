@@ -1,11 +1,11 @@
-import InterfaceTV from "@/components/InterfaceTV";
+import InterfaceTV from "@/features/tv/InterfaceTV";
 
 const PaginaTV = () => {
   // Para demonstração, pode ser TV geral ou de setor específico
   const isSetorEspecifico = new URLSearchParams(window.location.search).get('setor');
-  
+
   return (
-    <InterfaceTV 
+    <InterfaceTV
       setorFoco={isSetorEspecifico || undefined}
       titulo={isSetorEspecifico ? `CHAMADAS - ${isSetorEspecifico.toUpperCase()}` : "CHAMADAS GERAIS - NGA"}
     />

@@ -11,7 +11,7 @@ const Welcome = () => {
   const handleComecar = () => {
     // Resetar estado ao começar novo atendimento
     dispatch({ type: 'RESET_TOTEM' });
-    navigate("/identificacao");
+    navigate("/welcome/identificacao");
   };
 
   return (
