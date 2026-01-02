@@ -29,14 +29,19 @@ export const PainelAdministrativo: React.FC = () => {
     const { state } = useTotem();
     const [stats, setStats] = useState<any>(null);
     const [periodo, setPeriodo] = useState<string>('hoje');
+    const [erro, setErro] = useState<string | null>(null);
 
     useEffect(() => {
         const atualizarStats = async () => {
             try {
                 const data = await obterEstatisticasCompletas(periodo);
-                if (data) setStats(data);
+                if (data) {
+                    setStats(data);
+                    setErro(null);
+                }
             } catch (e) {
                 console.error('Erro ao buscar estatísticas:', e);
+                setErro('Não foi possível conectar à Inteligência NGA. Verifique se o servidor está online.');
             }
         };
 
@@ -45,7 +50,16 @@ export const PainelAdministrativo: React.FC = () => {
         return () => clearInterval(interval);
     }, [periodo]);
 
-    if (!stats) return <div className="p-20 text-center font-black animate-pulse text-blue-600 uppercase text-4xl">Carregando Inteligência NGA...</div>;
+    if (erro) return (
+        <div className="h-full w-full flex flex-col items-center justify-center p-10 bg-slate-50">
+            <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+            <div className="text-center font-black text-red-600 uppercase text-2xl max-w-md">{erro}</div>
+            <Button onClick={() => window.location.reload()} className="mt-6 bg-blue-600 uppercase font-bold">Tentar Novamente</Button>
+            <p className="mt-4 text-slate-400 text-xs uppercase font-bold">API URL: {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}</p>
+        </div>
+    );
+
+    if (!stats) return <div className="h-full w-full flex items-center justify-center bg-slate-50"><div className="text-center font-black animate-pulse text-blue-600 uppercase text-4xl">Carregando Inteligência NGA...</div></div>;
 
     return (
         <div className="h-full w-full bg-slate-50 p-6 space-y-6 overflow-y-auto pb-20">
