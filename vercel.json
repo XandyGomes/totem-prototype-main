@@ -1,6 +1,8 @@
 {
   "version": 2,
-  "public": true,
+  "buildCommand": "npm run build --prefix frontend",
+  "installCommand": "npm install --prefix frontend",
+  "framework": "nextjs",
   "headers": [
     {
       "source": "/(.*)",
