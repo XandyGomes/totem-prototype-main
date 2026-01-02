@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # Banco de Dados PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: totem-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: totem_db
+    ports:
+      - '5433:5432'
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Interface para visualizar o banco (Opcional, mas ajuda muito)
+  adminer:
+    image: adminer
+    container_name: totem-adminer
+    restart: always
+    ports:
+      - '8080:8080'
+
+volumes:
+  postgres_data:
