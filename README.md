@@ -34,8 +34,10 @@ npm run dev
 
 This project is built with:
 
-- Vite
+- Next.js (Frontend)
+- NestJS (Backend)
+- Prisma (ORM)
+- PostgreSQL (SQL Database)
 - TypeScript
-- React
 - shadcn-ui
 - Tailwind CSS
