@@ -1,43 +1,105 @@
-## Project info
+# 🏥 Totem Prototype - NGA (Núcleo de Gestão Ambulatorial)
 
-Follow these steps:
+Este é um sistema completo de gestão de filas e atendimento para o **NGA**, desenvolvido com uma arquitetura moderna de monorepo, focado em performance, design premium e escalabilidade.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🚀 Arquitetura e Tecnologias
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+O projeto é dividido em dois grandes módulos (Monorepo):
 
-# Step 3: Install the necessary dependencies.
-npm i
+### 💻 Frontend (Next.js)
+- **Framework:** Next.js 15+ (App Router)
+- **Styling:** Tailwind CSS & Shadcn/UI
+- **Icons:** Lucide React
+- **Estado/API:** Axios & Sonner (Notificações)
+- **Deploy:** Vercel
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### ⚙️ Backend (NestJS)
+- **Framework:** NestJS (Node.js)
+- **ORM:** Prisma
+- **Banco de Dados:** PostgreSQL (Hospedado no Supabase)
+- **Infra:** Docker ready
+- **Deploy:** Render
+
+---
+
+## 📂 Estrutura do Projeto
+
+```text
+totem-prototype/
+├── frontend/           # Aplicação Next.js (Totem, TV, Médico, Painel)
+├── backend/            # API NestJS (Lógica de negócio, Banco de Dados)
+├── package.json        # Configuração de scripts da raiz
+└── vercel.json         # Configuração de deploy Vercel
+```
+
+---
+
+## 🛠️ Configuração Local
+
+### Pré-requisitos
+- Node.js 20+
+- NPM ou Bun
+
+### 1. Clone e Instalação
+```bash
+git clone https://github.com/XandyGomes/totem-prototype-main.git
+cd totem-prototype
+npm install
+```
+
+### 2. Configuração de Variáveis de Ambiente
+Crie um arquivo `.env` na pasta `backend/` e outro na pasta `frontend/` seguindo os exemplos abaixo:
+
+**No Backend (`backend/.env`):**
+```env
+DATABASE_URL="postgresql://user:password@host:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://user:password@host:5432/postgres"
+PORT=3001
+```
+
+**No Frontend (`frontend/.env.local`):**
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_SUPABASE_URL=sua_url_supabase
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anon
+```
+
+### 3. Execução
+Para rodar os dois projetos simultaneamente:
+```bash
+# Na raiz do projeto
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Ou individualmente:
+```bash
+# Frontend
+cd frontend && npm run dev
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+# Backend
+cd backend && npm run start:dev
+```
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🚀 Deploy em Produção
 
-## What technologies are used for this project?
+O projeto está configurado para Deploy Contínuo (CI/CD):
 
-This project is built with:
+- **Frontend:** Implantado na **Vercel** apontando para o diretório `frontend/`.
+- **Backend:** Implantado no **Render** apontando para o diretório `backend/`.
+- **Banco de Dados:** Gerenciado pelo **Supabase**.
 
-- Next.js (Frontend)
-- NestJS (Backend)
-- Prisma (ORM)
-- PostgreSQL (SQL Database)
-- TypeScript
-- shadcn-ui
-- Tailwind CSS
+---
+
+## 🖥️ Funcionalidades principais
+
+1.  **Totem de Identificação:** Cadastro simplificado e emissão de senhas.
+2.  **Painel da TV:** Chamadas em tempo real com voz e histórico.
+3.  **Interface Médica:** Gestão da fila, chamada de pacientes e finalização de consultas.
+4.  **Gestão & Performance NGA:** Dashboard administrativo com KPIs (TME, Atendimentos por setor, Status do sistema).
+
+---
+
+## 📄 Licença
+Este projeto é privado e destinado ao uso do Núcleo de Gestão Ambulatorial (NGA).
