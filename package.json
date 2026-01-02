@@ -2,9 +2,14 @@
     "name": "totem-prototype-monorepo",
     "private": true,
     "scripts": {
-        "dev": "npm run dev --prefix frontend & npm run start:dev --prefix backend",
+        "dev": "npm run dev --prefix frontend",
         "build": "npm run build --prefix frontend",
-        "backend-build": "npm run build --prefix backend",
+        "start": "npm run start --prefix frontend",
         "install-all": "npm install --prefix frontend && npm install --prefix backend"
+    },
+    "dependencies": {
+        "next": "16.1.1",
+        "react": "19.2.3",
+        "react-dom": "19.2.3"
     }
 }
