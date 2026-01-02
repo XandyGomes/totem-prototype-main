@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm run build --prefix frontend",
-  "installCommand": "npm install --prefix frontend",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install && npm run install-all",
   "public": true,
   "headers": [
     {
