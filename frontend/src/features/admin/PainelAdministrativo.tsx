@@ -41,7 +41,7 @@ export const PainelAdministrativo: React.FC = () => {
                 }
             } catch (e) {
                 console.error('Erro ao buscar estatísticas:', e);
-                setErro('Não foi possível conectar à Inteligência NGA. Verifique se o servidor está online.');
+                setErro('Conectando ao NGA... (O servidor pode levar até 1 minuto para iniciar no primeiro acesso)');
             }
         };
 
