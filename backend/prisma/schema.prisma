@@ -1,0 +1,82 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum StatusFila {
+  aguardando
+  chamando
+  em_atendimento
+  atendido
+}
+
+model PacienteFila {
+  id               String     @id @default(uuid())
+  cpf              String
+  nome_paciente    String
+  medico_id        String
+  medico_nome      String
+  setor_id         String
+  setor_nome       String
+  senha_numero     String
+  prioridade_tipo  String
+  prioridade_nivel Int
+  status           StatusFila @default(aguardando)
+  created_at       DateTime   @default(now())
+  updated_at       DateTime   @updatedAt
+
+  @@map("pacientes_fila")
+}
+
+model ChamadaTV {
+  id              String   @id @default(uuid())
+  senha           String
+  paciente_nome   String
+  medico          String
+  sala            String
+  setor           String
+  prioridade_tipo String
+  created_at      DateTime @default(now())
+
+  @@map("chamadas_tv")
+}
+
+model LogOperacional {
+  id        String   @id @default(uuid())
+  mensagem  String
+  tipo      String   // 'INFO', 'WARN', 'ERROR', 'SUCCESS'
+  detalhes  String?
+  timestamp DateTime @default(now())
+
+  @@map("logs_operacionais")
+}
+
+model SessaoMedico {
+  id          String   @id @default(uuid())
+  medico_id   String   @unique
+  medico_nome String
+  sala        String
+  setor       String
+  ultima_atividade DateTime @updatedAt
+
+  @@map("sessoes_medicos")
+}
+
+model Medico {
+  id            String   @id @default(uuid())
+  nome          String
+  crm           String   @unique
+  especialidade String
+  login         String   @unique
+  senha         String
+  ativo         Boolean  @default(true)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@map("medicos")
+}
