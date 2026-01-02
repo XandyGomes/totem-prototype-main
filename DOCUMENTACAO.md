@@ -42,21 +42,33 @@ O **Totem NGA** é uma solução de gestão de fluxo de pacientes projetada para
 
 ### 4.1. Diagrama de Casos de Uso
 ```mermaid
-useCaseDiagram
-    actor Paciente
-    actor Medico
-    actor Administrador
+flowchart LR
+    Paciente((Paciente))
+    Medico((Médico))
+    Administrador((Administrador))
     
-    Paciente --> (Emitir Senha)
-    Paciente --> (Identificar-se)
+    subgraph Sistema Totem NGA
+        UC1(Emitir Senha)
+        UC2(Identificar-se)
+        UC3(Visualizar Fila)
+        UC4(Chamar Paciente)
+        UC5(Finalizar Atendimento)
+        UC6(Ver Estatísticas)
+        UC7(Resetar Sistema)
+        UC8(Atualizar TV)
+    end
     
-    Medico --> (Visualizar Fila)
-    Medico --> (Chamar Paciente)
-    Medico --> (Finalizar Atendimento)
+    Paciente --> UC1
+    Paciente --> UC2
     
-    Administrador --> (Ver Estatísticas)
-    Administrador --> (Resetar Sistema)
-    (Chamar Paciente) ..> (Atualizar TV) : <<include>>
+    Medico --> UC3
+    Medico --> UC4
+    Medico --> UC5
+    
+    Administrador --> UC6
+    Administrador --> UC7
+    
+    UC4 -.->|include| UC8
 ```
 
 ### 4.2. Diagrama de Classes (Domínio)
@@ -113,21 +125,49 @@ sequenceDiagram
 
 ---
 
-## 6. Modelo de Dados (Entidades Principais)
+## 7. Modelagem de Dados (DER - Diagrama Entidade Relacionamento)
 
-### Tabela `pacientes_fila`
-- `id`: UUID (Primary Key)
-- `nome`: String
-- `cpf`: String
-- `prioridade`: String
-- `status`: String (Aguardando, Chamando, Atendido)
-- `created_at`: DateTime
+Abaixo, a representação visual de como as tabelas se relacionam no banco de dados PostgreSQL:
 
-### Tabela `chamadas_tv`
-- `id`: UUID
-- `paciente_id`: FK
-- `sala`: String
-- `setor`: String
+```mermaid
+erDiagram
+    PACIENTE_FILA ||--o| CHAMADA_TV : "gera"
+    PACIENTE_FILA ||--o| LOG_OPERACIONAL : "histórico"
+    MEDICO ||--o{ CHAMADA_TV : "realiza"
+
+    PACIENTE_FILA {
+        uuid id PK
+        string nome
+        string cpf
+        string prioridade
+        string status
+        datetime created_at
+        datetime updated_at
+    }
+
+    CHAMADA_TV {
+        uuid id PK
+        uuid paciente_id FK
+        string sala
+        string setor
+        datetime created_at
+    }
+
+    MEDICO {
+        uuid id PK
+        string nome
+        string especialidade
+        string status
+    }
+
+    LOG_OPERACIONAL {
+        uuid id PK
+        uuid paciente_id FK
+        string acao
+        string detalhes
+        datetime created_at
+    }
+```
 
 ---
 
