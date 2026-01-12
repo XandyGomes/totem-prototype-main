@@ -209,28 +209,7 @@ export const mockSetores: Setor[] = [
     { id: 'laranja', nome: 'Setor Laranja', cor: '#f97316', corNome: 'laranja', salas: ['17', '18', '19', '20'] }
 ];
 
-export const mockConsultas: Consulta[] = [
-    {
-        id: '1',
-        data: new Date().toISOString().split('T')[0],
-        hora: '09:00',
-        paciente: { cpf: '11111111111', nome: 'João Silva Santos', idade: 45 },
-        medico: { id: 'med1', nome: 'Dr. Carlos Oliveira', especialidade: 'Cardiologia', crm: 'CRM/SP 123456' },
-        setor: 'Setor Verde',
-        sala: '01',
-        status: 'agendada'
-    },
-    {
-        id: '2',
-        data: new Date().toISOString().split('T')[0],
-        hora: '10:30',
-        paciente: { cpf: '22222222222', nome: 'Maria José Ferreira', idade: 82 },
-        medico: { id: 'med2', nome: 'Dra. Ana Santos', especialidade: 'Geriatria', crm: 'CRM/SP 654321' },
-        setor: 'Setor Amarelo',
-        sala: '05',
-        status: 'agendada'
-    }
-];
+export const mockConsultas: Consulta[] = [];
 
 export const typesPriority: Record<string, { descricao: string; nivel: 1 | 2 | 3; icone: string; IconeComponente: React.ComponentType }> = {
     superprioridade: { descricao: 'Idoso 80+ anos (Superprioridade)', nivel: 1, icone: '⭐', IconeComponente: Star },
