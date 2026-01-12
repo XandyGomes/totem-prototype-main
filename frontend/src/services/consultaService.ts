@@ -41,23 +41,9 @@ export const validarConsultaAgendada = async (identificacao: string): Promise<{
         console.error('Erro ao buscar no SIGS:', e);
     }
 
-    // 2. Fallback para os mocks locais
-    const consultaEncontrada = mockConsultas.find(
-        consulta => consulta.paciente.cpf === cpfLimpo &&
-            consulta.data === new Date().toISOString().split('T')[0] &&
-            consulta.status === 'agendada'
-    );
-
-    if (!consultaEncontrada) {
-        return {
-            sucesso: false,
-            erro: 'Não encontramos consulta agendada para hoje no SIGS.'
-        };
-    }
-
     return {
-        sucesso: true,
-        consulta: consultaEncontrada
+        sucesso: false,
+        erro: 'Não encontramos consulta agendada para hoje no SIGS.'
     };
 };
 
