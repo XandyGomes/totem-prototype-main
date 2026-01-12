@@ -24,6 +24,7 @@ import {
 import { useTotem } from '@/contexts/TotemContext';
 import { obterEstatisticasCompletas, resetarBancoDeDados, limparLogs } from '@/services/filaService';
 import { toast } from "sonner";
+import Link from 'next/link';
 
 export const PainelAdministrativo: React.FC = () => {
     const { state } = useTotem();
@@ -228,6 +229,15 @@ export const PainelAdministrativo: React.FC = () => {
                             Operacional (Logs)
                         </CardTitle>
                         <div className="flex gap-2">
+                            <Link href="/admin/sigs">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-xs font-black border-blue-200 text-blue-600 hover:bg-blue-50 uppercase shadow-sm"
+                                >
+                                    Banco SIGS
+                                </Button>
+                            </Link>
                             <Button
                                 variant="outline"
                                 size="sm"

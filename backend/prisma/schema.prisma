@@ -80,3 +80,22 @@ model Medico {
 
   @@map("medicos")
 }
+
+model AgendamentoSIGS {
+  id              String   @id @default(uuid())
+  cpf             String
+  nome_paciente   String
+  medico_id       String?
+  medico_nome     String?
+  medico_especialidade String?
+  setor_id        String?
+  setor_nome      String?
+  data_agendamento DateTime
+  horario         String?
+  check_in        Boolean  @default(false)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@map("agendamentos_sigs")
+}
+

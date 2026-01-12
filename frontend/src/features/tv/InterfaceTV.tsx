@@ -15,7 +15,7 @@ interface InterfaceTVProps {
 const InterfaceTV = ({ setorFoco, titulo = "PAINEL DE CHAMADAS" }: InterfaceTVProps) => {
     const [chamadas, setChamadas] = useState<any[]>([]);
     const [horaAtual, setHoraAtual] = useState(new Date());
-    const [ultimaSenhaFalada, setUltimaSenhaFalada] = useState<string>("");
+    const [ultimoIdChamado, setUltimoIdChamado] = useState<string>("");
 
     const tocarChime = () => {
         try {
@@ -79,8 +79,8 @@ const InterfaceTV = ({ setorFoco, titulo = "PAINEL DE CHAMADAS" }: InterfaceTVPr
 
                 const novaLista = chamadasFiltradas.slice(0, 6);
 
-                if (novaLista.length > 0 && novaLista[0].senha !== ultimaSenhaFalada) {
-                    setUltimaSenhaFalada(novaLista[0].senha);
+                if (novaLista.length > 0 && novaLista[0].id !== ultimoIdChamado) {
+                    setUltimoIdChamado(novaLista[0].id);
                     falarChamada(novaLista[0]);
                 }
 
@@ -103,7 +103,7 @@ const InterfaceTV = ({ setorFoco, titulo = "PAINEL DE CHAMADAS" }: InterfaceTVPr
             clearInterval(intervalHora);
             if (typeof window !== 'undefined') window.speechSynthesis.cancel();
         };
-    }, [setorFoco, ultimaSenhaFalada]);
+    }, [setorFoco, ultimoIdChamado]);
 
     const getSetorData = (setorNome: string) => {
         return mockSetores.find(s =>
