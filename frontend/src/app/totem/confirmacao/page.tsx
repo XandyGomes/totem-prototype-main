@@ -12,6 +12,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { IconePrioridade } from "@/components/IconePrioridade";
 import { adicionarPacienteNaFila } from "@/services/filaService";
+import { sigsService } from "@/services/sigsService";
 
 export default function ConfirmacaoPage() {
     const router = useRouter();
@@ -74,16 +75,22 @@ export default function ConfirmacaoPage() {
             dispatch({ type: 'SET_SENHA_GERADA', payload: senhaGerada });
 
             try {
+                // Registrar na fila real do hospital (PostgreSQL)
                 await adicionarPacienteNaFila({
                     consulta,
                     prioridade,
                     senha: senhaGerada,
                     horarioChegada: new Date().toISOString()
                 });
+
+                // Marcar presença no Banco SIGS
+                if (consulta.id && consulta.id.length > 30) { // IDs de UUID tem 36 chars
+                    await sigsService.checkIn(consulta.id);
+                }
             } catch (e) {
-                console.error('Falha ao salvar na fila:', e);
+                console.error('Falha ao salvar na fila ou SIGS:', e);
                 toast.error("Erro de Sincronização", {
-                    description: "Sua senha foi gerada, mas houve um erro ao sincronizar com o painel médico."
+                    description: "Sua senha foi gerada, mas houve um erro ao sincronizar com o banco central."
                 });
             }
 
@@ -106,7 +113,7 @@ export default function ConfirmacaoPage() {
                 return;
             }
 
-            toast.success("Senha gerada!", { description: `Sua senha: ${numeroSenha}` });
+            toast.success("Presença Confirmada!", { description: `Senha: ${numeroSenha} para ${consulta.paciente.nome}` });
             router.push("/totem/senha");
 
         } catch (error) {
@@ -116,6 +123,7 @@ export default function ConfirmacaoPage() {
             setIsGenerating(false);
         }
     };
+
 
     return (
         <div className="min-h-screen flex flex-col bg-background">

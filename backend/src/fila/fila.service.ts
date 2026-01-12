@@ -298,8 +298,13 @@ export class FilaService {
                 await (this.prisma as any).medico.deleteMany();
             }
 
+            // Limpa agendamentos do SIGS (Simulador)
+            if ((this.prisma as any).agendamentoSIGS) {
+                await (this.prisma as any).agendamentoSIGS.deleteMany();
+            }
+
             // Registra o reset nos logs (mantém histórico)
-            await this.log('WARN', 'Banco de dados resetado via Painel Administrativo', 'Pacientes, chamadas TV, sessões e médicos foram removidos');
+            await this.log('WARN', 'Banco de dados resetado via Painel Administrativo', 'Pacientes, chamadas TV, sessões, médicos e agendamentos SIGS foram removidos');
 
             console.log('✅ Banco de dados resetado (logs preservados para rastreabilidade)');
             return { success: true, message: 'Banco de dados resetado (logs preservados)' };
