@@ -37,13 +37,13 @@ const TicketImpresso = () => {
 
     const getLineName = (corNome: string) => {
         const lineNames: { [key: string]: string } = {
-            'verde': 'LINHA VERDE',
-            'amarelo': 'LINHA AMARELA',
-            'azul': 'LINHA AZUL',
-            'violeta': 'LINHA VIOLETA',
-            'laranja': 'LINHA LARANJA'
+            'verde': 'FAIXA VERDE',
+            'amarelo': 'FAIXA AMARELA',
+            'azul': 'FAIXA AZUL',
+            'violeta': 'FAIXA VIOLETA',
+            'laranja': 'FAIXA LARANJA'
         };
-        return lineNames[corNome] || 'LINHA CINZA';
+        return lineNames[corNome] || 'FAIXA CINZA';
     };
 
     const lineName = getLineName(setor.corNome);

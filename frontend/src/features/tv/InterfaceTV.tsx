@@ -113,13 +113,13 @@ const InterfaceTV = ({ setorFoco, titulo = "PAINEL DE CHAMADAS" }: InterfaceTVPr
 
     const getLineName = (corNome: string) => {
         const lineNames: { [key: string]: string } = {
-            'verde': 'LINHA VERDE',
-            'amarelo': 'LINHA AMARELA',
-            'azul': 'LINHA AZUL',
-            'violeta': 'LINHA VIOLETA',
-            'laranja': 'LINHA LARANJA'
+            'verde': 'FAIXA VERDE',
+            'amarelo': 'FAIXA AMARELA',
+            'azul': 'FAIXA AZUL',
+            'violeta': 'FAIXA VIOLETA',
+            'laranja': 'FAIXA LARANJA'
         };
-        return lineNames[corNome] || 'LINHA CINZA';
+        return lineNames[corNome] || 'FAIXA CINZA';
     };
 
     return (
@@ -246,7 +246,7 @@ const InterfaceTV = ({ setorFoco, titulo = "PAINEL DE CHAMADAS" }: InterfaceTVPr
                     <div className="bg-blue-900/30 border-t-2 border-blue-500/30 p-4 rounded-t-3xl overflow-hidden whitespace-nowrap">
                         <div className="inline-block animate-marquee whitespace-nowrap">
                             <span className="mx-10 text-2xl font-bold text-blue-200 uppercase">🔊 Fique atento ao seu nome e senha no painel</span>
-                            <span className="mx-10 text-2xl font-bold text-blue-200 uppercase">📍 Siga as linhas coloridas no chão para chegar ao consultório</span>
+                            <span className="mx-10 text-2xl font-bold text-blue-200 uppercase">📍 Siga as faixas coloridas no chão para chegar ao consultório</span>
                             <span className="mx-10 text-2xl font-bold text-blue-200 uppercase">📑 Mantenha seus documentos em mãos para facilitar o atendimento</span>
                             <span className="mx-10 text-2xl font-bold text-blue-200 uppercase">♿ Prioridade absoluta para maiores de 80 anos</span>
                         </div>

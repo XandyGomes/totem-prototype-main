@@ -220,6 +220,6 @@ export const typesPriority: Record<string, { descricao: string; nivel: 1 | 2 | 3
     crianca_colo: { descricao: 'Criança de colo', nivel: 2, icone: '👶', IconeComponente: Baby },
     autista: { descricao: 'Autista (TEA)', nivel: 2, icone: '🧩', IconeComponente: Puzzle },
     mobilidade_reduzida: { descricao: 'Mobilidade Reduzida', nivel: 2, icone: '🚶', IconeComponente: UserCheck },
-    obeso: { descricao: 'Obesidade Grante', nivel: 2, icone: '⚖️', IconeComponente: Scale },
+    obeso: { descricao: 'Obesidade', nivel: 2, icone: '⚖️', IconeComponente: Scale },
     comum: { descricao: 'Atendimento Comum', nivel: 3, icone: '👤', IconeComponente: User }
 };

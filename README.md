@@ -1,4 +1,4 @@
-# 🏥 Totem Prototype - NGA (Núcleo de Gestão Ambulatorial)
+# 🏥 Totem Prototype - NGA (Núcleo de Gestão Assistencial)
 
 Este é um sistema completo de gestão de filas e atendimento para o **NGA**, desenvolvido com uma arquitetura moderna de monorepo, focado em performance, design premium e escalabilidade.
 
@@ -102,4 +102,4 @@ O projeto está configurado para Deploy Contínuo (CI/CD):
 ---
 
 ## 📄 Licença
-Este projeto é privado e destinado ao uso do Núcleo de Gestão Ambulatorial (NGA).
+Este projeto é privado e destinado ao uso do Núcleo de Gestão Assistencial (NGA).
