@@ -31,7 +31,7 @@ export default function SetorIncorretoPage() {
                         <div className="text-[2vw] sm:text-[1.8vw] md:text-[1.5vw] lg:text-[1.2vw] xl:text-[1vw] text-muted-foreground font-medium space-y-2">
                             <p>• Procure a <span className="text-primary font-bold">recepção principal</span> para orientação</p>
                             <p>• Verifique qual setor você deve se dirigir</p>
-                            <p>• Siga as linhas coloridas no chão até o setor correto</p>
+                            <p>• Siga as faixas coloridas no chão até o setor correto</p>
                         </div>
                     </div>
 

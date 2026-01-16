@@ -50,7 +50,7 @@ export default function ConfirmacaoPage() {
     };
 
     const lineColors = getLineColors(setor.corNome);
-    const lineName = `Linha ${setor.corNome}`.toUpperCase();
+    const lineName = `Faixa ${setor.corNome}`.toUpperCase();
 
     const handleConfirm = async () => {
         setIsGenerating(true);
