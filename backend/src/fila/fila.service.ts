@@ -231,9 +231,19 @@ export class FilaService {
     }
 
     async reset() {
-        await this.prisma.chamadaTV.deleteMany({});
-        await this.prisma.consultaIntegracao.deleteMany({});
-        await this.log('WARN', 'O banco de dados foi resetado (Simulado)');
+        // 1. Limpa a memória das sessões ativas (expulsa todos os médicos do Dashboard)
+        this.medicoSessoes = [];
+
+        // 2. Limpa todas as tabelas transacionais e de cadastro
+        await Promise.all([
+            this.prisma.chamadaTV.deleteMany({}),
+            this.prisma.consultaIntegracao.deleteMany({}),
+            this.prisma.medicoIntegracao.deleteMany({}),
+            this.prisma.pacienteIntegracao.deleteMany({}),
+            this.prisma.unidadeIntegracao.deleteMany({})
+        ]);
+
+        await this.log('WARN', 'O banco de dados foi resetado completamente');
         return { success: true };
     }
 
