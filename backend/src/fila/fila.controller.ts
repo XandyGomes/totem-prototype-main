@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Query } from '@nestjs/common';
 import { FilaService } from './fila.service';
-import { StatusFila } from '@prisma/client';
 
 @Controller('fila')
 export class FilaController {
@@ -13,7 +12,7 @@ export class FilaController {
 
     @Get()
     findAll(@Query('medicoId') medicoId?: string) {
-        return this.filaService.findAll(medicoId);
+        return this.filaService.findAll(Number(medicoId));
     }
 
     @Get('tv')
@@ -21,34 +20,25 @@ export class FilaController {
         return this.filaService.getChamadasTV();
     }
 
-    @Get('estatisticas')
-    getEstatisticas(@Query('medicoId') medicoId: string) {
-        return this.filaService.getEstatisticas(medicoId);
-    }
-
     @Get('dashboard')
-    getDashboard(@Query('periodo') periodo: string) {
-        return this.filaService.getDashboard(periodo);
+    getDashboard() {
+        return this.filaService.getDashboard();
     }
 
-    @Post('reset')
-    resetData() {
-        return this.filaService.resetData();
+    // Adaptado para simular o "Chamar" do SIGS usando a consulta
+    @Patch('chamar')
+    chamarPaciente(@Body() body: { compositeKey: any, sala: string }) {
+        return this.filaService.chamarPaciente(body.compositeKey, body.sala);
     }
 
-    @Post('limpar-logs')
-    limparLogs() {
-        return this.filaService.limparLogs();
+    @Patch('iniciar')
+    iniciarAtendimento(@Body() body: { compositeKey: any }) {
+        return this.filaService.iniciarAtendimento(body.compositeKey);
     }
 
-    @Patch(':id/status')
-    updateStatus(@Param('id') id: string, @Body('status') status: StatusFila) {
-        return this.filaService.updateStatus(id, status);
-    }
-
-    @Patch(':id/chamar')
-    chamarPaciente(@Param('id') id: string, @Body('sala') sala: string) {
-        return this.filaService.chamarPaciente(id, sala);
+    @Patch('finalizar')
+    finalizarAtendimento(@Body() body: { compositeKey: any }) {
+        return this.filaService.finalizarAtendimento(body.compositeKey);
     }
 
     @Post('sessao')
@@ -60,9 +50,10 @@ export class FilaController {
     removerSessao(@Body() data: { medico_id: string }) {
         return this.filaService.removerSessao(data.medico_id);
     }
-    @Post('medicos')
-    createMedico(@Body() data: { nome: string; crm: string; especialidade: string; login: string; senha: string }) {
-        return this.filaService.createMedico(data);
+
+    @Get('medicos')
+    findAllMedicos() {
+        return this.filaService.findAllMedicos();
     }
 
     @Post('login')
@@ -74,8 +65,13 @@ export class FilaController {
         return medico;
     }
 
-    @Get('medicos')
-    findAllMedicos() {
-        return this.filaService.findAllMedicos();
+    @Post('reset')
+    reset() {
+        return this.filaService.reset();
+    }
+
+    @Post('limpar-logs')
+    limparLogs() {
+        return this.filaService.limparLogs();
     }
 }

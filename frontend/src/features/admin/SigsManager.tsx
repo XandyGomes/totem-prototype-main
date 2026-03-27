@@ -124,10 +124,12 @@ export const SigsManager: React.FC = () => {
         }
     };
 
-    const filteredAgendamentos = agendamentos.filter(a =>
-        a.nome_paciente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        a.cpf.includes(searchTerm)
-    );
+    const filteredAgendamentos = agendamentos.filter(a => {
+        const nome = a.paciente?.nome?.toLowerCase() || '';
+        const cpf = a.paciente?.cpf || '';
+        const search = searchTerm.toLowerCase();
+        return nome.includes(search) || cpf.includes(searchTerm);
+    });
 
     return (
         <div className="h-full w-full bg-slate-100 p-6 space-y-6 overflow-y-auto min-h-screen pb-20">
@@ -295,43 +297,46 @@ export const SigsManager: React.FC = () => {
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
-                                            {filteredAgendamentos.map((item) => (
-                                                <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
-                                                    <td className="px-6 py-6 border-b">
-                                                        <div className="font-black text-slate-900 uppercase text-base">{item.nome_paciente}</div>
-                                                        <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1 mt-1">
-                                                            <CreditCard className="w-3 h-3" /> CPF: {item.cpf}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-6 border-b">
-                                                        <div className="font-black text-slate-700 uppercase text-sm">DR(A). {item.medico_nome}</div>
-                                                        <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1 mt-1">
-                                                            <MapPin className="w-3 h-3" /> {item.setor_nome} • {item.horario}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-6 border-b text-center">
-                                                        {item.check_in ? (
-                                                            <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 uppercase font-black px-3 py-1">
-                                                                <CheckCircle2 className="w-3 h-3 mr-1" /> Compareceu
-                                                            </Badge>
-                                                        ) : (
-                                                            <Badge variant="outline" className="text-slate-400 border-slate-200 uppercase font-black px-3 py-1">
-                                                                <Clock className="w-3 h-3 mr-1" /> Aguardando
-                                                            </Badge>
-                                                        )}
-                                                    </td>
-                                                    <td className="px-6 py-6 border-b text-right">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => handleDelete(item.id)}
-                                                            className="text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
-                                                        >
-                                                            <Trash2 className="w-5 h-5" />
-                                                        </Button>
-                                                    </td>
-                                                </tr>
-                                            ))}
+                                            {filteredAgendamentos.map((item) => {
+                                                const itemId = `${item.matricula_paciente}-${item.codigo_medico}-${item.data}-${item.hora}`;
+                                                return (
+                                                    <tr key={itemId} className="hover:bg-slate-50 transition-colors group">
+                                                        <td className="px-6 py-6 border-b">
+                                                            <div className="font-black text-slate-900 uppercase text-base">{item.paciente.nome}</div>
+                                                            <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1 mt-1">
+                                                                <CreditCard className="w-3 h-3" /> CPF: {item.paciente.cpf}
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-6 border-b">
+                                                            <div className="font-black text-slate-700 uppercase text-sm">{item.medico.nome}</div>
+                                                            <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1 mt-1">
+                                                                <MapPin className="w-3 h-3" /> {item.unidade.setor || item.unidade.nome} • {item.hora}
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-6 border-b text-center">
+                                                            {item.presencaConfirmada === 'S' ? (
+                                                                <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 uppercase font-black px-3 py-1">
+                                                                    <CheckCircle2 className="w-3 h-3 mr-1" /> Compareceu
+                                                                </Badge>
+                                                            ) : (
+                                                                <Badge variant="outline" className="text-slate-400 border-slate-200 uppercase font-black px-3 py-1">
+                                                                    <Clock className="w-3 h-3 mr-1" /> Aguardando
+                                                                </Badge>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-6 py-6 border-b text-right">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => handleDelete(itemId)} // No real excluiria pela chave composta se houver endpoint, mas aqui é simulado
+                                                                className="text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                                                            >
+                                                                <Trash2 className="w-5 h-5" />
+                                                            </Button>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
                                         </tbody>
                                     </table>
                                 </div>
