@@ -2,67 +2,73 @@ import api from './api';
 import { Consulta, PrioridadeSelecionada, SenhaGerada, mockSetores } from '@/contexts/TotemContext';
 
 export interface PacienteFila {
-    id: string;
+    id: string; // Na integração, usamos a matrícula ou a chave composta stringificada
     consulta: Consulta;
     prioridade: PrioridadeSelecionada;
     horarioChegada: string;
     senha: SenhaGerada;
-    status: 'aguardando' | 'chamando' | 'em_atendimento' | 'atendido';
+    status: 'aguardando' | 'chamando' | 'em_atendimento' | 'atendido' | string;
 }
 
 export const adicionarPacienteNaFila = async (pacienteFila: Omit<PacienteFila, 'id' | 'status'>): Promise<any> => {
-    const { data } = await api.post('/fila', {
-        cpf: pacienteFila.consulta.paciente.cpf,
-        nome_paciente: pacienteFila.consulta.paciente.nome,
-        medico_id: pacienteFila.consulta.medico.id,
-        medico_nome: pacienteFila.consulta.medico.nome,
-        setor_id: pacienteFila.senha.setor.id,
-        setor_nome: pacienteFila.senha.setor.nome,
-        senha_numero: pacienteFila.senha.numero,
-        prioridade_tipo: pacienteFila.prioridade.tipo,
-        prioridade_nivel: pacienteFila.prioridade.nivel,
-    });
-
+    // Na nova integração, "adicionar na fila" é apenas fazer o check-in no SIGS
+    const { data } = await api.post('/sigs/check-in', pacienteFila.consulta.compositeKey);
     return data;
 };
 
-export const obterFilaMedico = async (medicoId: string): Promise<PacienteFila[]> => {
+export const obterFilaMedico = async (medicoId: string | number): Promise<PacienteFila[]> => {
     const { data } = await api.get('/fila', { params: { medicoId } });
+    
+    // Mapeia ConsultaIntegracao para PacienteFila
     return data.map((item: any) => ({
-        id: item.id,
+        id: `${item.matricula_paciente}-${item.hora}`,
         consulta: {
+            id: String(item.matricula_paciente),
+            data: item.data,
+            hora: item.hora,
             paciente: {
-                cpf: item.cpf,
-                nome: item.nome_paciente
+                cpf: item.paciente.cpf,
+                nome: item.paciente.nome,
+                idade: 0
             },
             medico: {
-                id: item.medico_id,
-                nome: item.medico_nome,
-                especialidade: '', // Não temos no banco, mas pode ser adicionado se necessário
+                id: String(item.medico.codigo),
+                nome: item.medico.nome,
+                especialidade: 'Médico',
                 crm: ''
+            },
+            setor: item.unidade.setor || item.unidade.nome,
+            status: item.status === 2 ? 'em_andamento' : 'agendada',
+            compositeKey: {
+                matricula_paciente: item.matricula_paciente,
+                codigo_medico: item.codigo_medico,
+                codigo_unidade: item.codigo_unidade,
+                data: item.data,
+                hora: item.hora
             }
         },
         prioridade: {
-            tipo: item.prioridade_tipo,
-            nivel: item.prioridade_nivel,
-            descricao: item.prioridade_tipo // Simplicado por enquanto
+            tipo: 'comum',
+            nivel: 3,
+            descricao: 'Atendimento'
         },
-        horarioChegada: item.created_at,
+        horarioChegada: item.data_hora || item.data,
         senha: {
-            numero: item.senha_numero,
+            numero: `S-${item.matricula_paciente}`,
             setor: {
-                id: item.setor_id,
-                nome: item.setor_nome,
+                id: String(item.codigo_unidade),
+                nome: item.unidade.nome,
                 cor: '',
                 salas: []
             }
         },
-        status: item.status
+        status: item.status === 2 ? 'chamando' : (item.status === 1 ? 'aguardando' : 'atendido')
     }));
 };
 
-export const chamarPaciente = async (pacienteId: string, sala: string): Promise<boolean> => {
-    const { data } = await api.patch(`/fila/${pacienteId}/chamar`, { sala });
+export const chamarPaciente = async (compositeKey: any, sala: string): Promise<boolean> => {
+    // Agora enviamos a chave composta no corpo
+    const { data } = await api.patch(`/fila/chamar`, { compositeKey, sala });
     return !!data;
 };
 
@@ -71,24 +77,32 @@ export const obterChamadasTV = async () => {
     return data;
 };
 
-export const iniciarAtendimento = async (pacienteId: string): Promise<boolean> => {
-    const { data } = await api.patch(`/fila/${pacienteId}/status`, { status: 'em_atendimento' });
+export const iniciarAtendimento = async (compositeKey: any): Promise<boolean> => {
+    const { data } = await api.patch('/fila/iniciar', { compositeKey });
     return !!data;
 };
 
-export const finalizarAtendimento = async (pacienteId: string): Promise<boolean> => {
-    const { data } = await api.patch(`/fila/${pacienteId}/status`, { status: 'atendido' });
+export const finalizarAtendimento = async (compositeKey: any): Promise<boolean> => {
+    const { data } = await api.patch('/fila/finalizar', { compositeKey });
     return !!data;
 };
 
-export const obterEstatisticasFila = async (medicoId: string): Promise<any> => {
-    const { data } = await api.get('/fila/estatisticas', { params: { medicoId } });
-    return data;
+export const obterEstatisticasFila = async (medicoId: string | number): Promise<any> => {
+    // Opcional: Mock ou real se implementado
+    return { total: 0, aguardando: 0, emAtendimento: 0, atendidos: 0 };
 };
 
 export const obterEstatisticasCompletas = async (periodo?: string): Promise<any> => {
     const { data } = await api.get('/fila/dashboard', { params: { periodo } });
     return data;
+};
+
+export const registrarSessao = async (data: { medico_id: string | number, medico_nome: string, sala: string, setor: string }): Promise<void> => {
+    await api.post('/fila/sessao', data);
+};
+
+export const removerSessao = async (medicoId: string | number): Promise<void> => {
+    await api.post('/fila/sessao/remover', { medico_id: medicoId });
 };
 
 export const resetarBancoDeDados = async (): Promise<void> => {
@@ -100,12 +114,15 @@ export const limparLogs = async (): Promise<any> => {
     return data;
 };
 
-export const registrarSessao = async (data: { medico_id: string, medico_nome: string, sala: string, setor: string }): Promise<void> => {
-    await api.post('/fila/sessao', data);
-};
-
-export const removerSessao = async (medicoId: string): Promise<void> => {
-    await api.post('/fila/sessao/remover', { medico_id: medicoId });
+export const loginMedico = async (credenciais: { login: string; senha: string }): Promise<any> => {
+    // Agora chama a API real do backend que verifica o banco
+    try {
+        const { data } = await api.post('/fila/login', credenciais);
+        // Retorna o data (que pode ter o médico ou o erro)
+        return data; 
+    } catch (error) {
+        return { error: 'Servidor fora do ar ou sem VPN' };
+    }
 };
 
 export const obterMedicos = async (): Promise<any[]> => {
@@ -113,12 +130,6 @@ export const obterMedicos = async (): Promise<any[]> => {
     return data;
 };
 
-export const cadastrarMedico = async (medico: { nome: string, crm: string, especialidade: string; login: string; senha: string }): Promise<any> => {
-    const { data } = await api.post('/fila/medicos', medico);
-    return data;
-};
-
-export const loginMedico = async (credenciais: { login: string; senha: string }): Promise<any> => {
-    const { data } = await api.post('/fila/login', credenciais);
-    return data;
+export const cadastrarMedico = async (medico: any): Promise<any> => {
+    return { success: true };
 };

@@ -201,7 +201,7 @@ const InterfaceTV = ({ setorFoco, titulo = "PAINEL DE CHAMADAS" }: InterfaceTVPr
                                 <div className="w-full grid grid-cols-3 gap-8 border-t-4 border-slate-100 pt-10">
                                     <div className="flex flex-col">
                                         <span className="text-2xl font-black text-slate-400 uppercase">Médico(a)</span>
-                                        <span className="text-4xl font-black text-slate-800 uppercase">{chamadas[0].medico}</span>
+                                        <span className="text-4xl font-black text-slate-800 uppercase">{chamadas[0].medico_nome || chamadas[0].medico}</span>
                                     </div>
                                     <div className="flex flex-col items-center">
                                         <span className="text-2xl font-black text-slate-400 uppercase">Setor</span>
@@ -231,7 +231,7 @@ const InterfaceTV = ({ setorFoco, titulo = "PAINEL DE CHAMADAS" }: InterfaceTVPr
                                     <div className="overflow-hidden">
                                         <span className="text-xl font-black text-blue-400 block uppercase">SALA {chamada.sala}</span>
                                         <span className="text-lg font-bold text-white uppercase block truncate">{chamada.paciente_nome}</span>
-                                        <span className="text-xs font-bold text-slate-500 uppercase block truncate">{chamada.medico}</span>
+                                        <span className="text-xs font-bold text-slate-500 uppercase block truncate">{chamada.medico_nome || chamada.medico}</span>
                                     </div>
                                 </div>
                                 <Badge variant="outline" className="text-xl font-black border-2 px-4 py-1 uppercase" style={{ borderColor: getSetorData(chamada.setor).cor, color: getSetorData(chamada.setor).cor }}>

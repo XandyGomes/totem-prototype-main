@@ -1,19 +1,30 @@
 import api from './api';
 
 export interface AgendamentoSIGS {
-    id: string;
-    cpf: string;
-    nome_paciente: string;
-    medico_id?: string;
-    medico_nome?: string;
-    medico_especialidade?: string;
-    setor_id?: string;
-    setor_nome?: string;
-    data_agendamento: string;
-    horario?: string;
-    check_in: boolean;
-    created_at: string;
-    updated_at: string;
+    matricula_paciente: number;
+    codigo_medico: number;
+    codigo_unidade: number;
+    data: string;
+    hora: number;
+    data_hora?: string;
+    presencaConfirmada: string;
+    status: number;
+    sala?: string;
+    paciente: {
+        matricula: number;
+        nome: string;
+        nomeSocial?: string;
+        cpf: string;
+    };
+    medico: {
+        codigo: number;
+        nome: string;
+    };
+    unidade: {
+        codigo: number;
+        nome: string;
+        setor?: string;
+    };
 }
 
 export const sigsService = {
@@ -27,22 +38,23 @@ export const sigsService = {
         return response.data;
     },
 
-    async create(data: Partial<AgendamentoSIGS>): Promise<AgendamentoSIGS> {
-        const response = await api.post('/sigs', data);
+    async checkIn(compositeKey: {
+        matricula_paciente: number;
+        codigo_medico: number;
+        codigo_unidade: number;
+        data: string;
+        hora: number;
+    }): Promise<AgendamentoSIGS> {
+        const response = await api.post(`/sigs/check-in`, compositeKey);
         return response.data;
     },
 
-    async update(id: string, data: Partial<AgendamentoSIGS>): Promise<AgendamentoSIGS> {
-        const response = await api.put(`/sigs/${id}`, data);
+    async create(data: any): Promise<any> {
+        const response = await api.post('/sigs', data);
         return response.data;
     },
 
     async delete(id: string): Promise<void> {
         await api.delete(`/sigs/${id}`);
-    },
-
-    async checkIn(id: string): Promise<AgendamentoSIGS> {
-        const response = await api.post(`/sigs/${id}/check-in`);
-        return response.data;
     }
 };

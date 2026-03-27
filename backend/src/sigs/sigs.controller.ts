@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Delete, Param } from '@nestjs/common';
 import { SigsService } from './sigs.service';
 
 @Controller('sigs')
@@ -15,23 +15,30 @@ export class SigsController {
         return this.sigsService.findByCpf(cpf);
     }
 
-    @Post()
-    create(@Body() data: any) {
-        return this.sigsService.create(data);
+    @Post('check-in')
+    checkIn(@Body() body: {
+        matricula_paciente: number;
+        codigo_medico: number;
+        codigo_unidade: number;
+        data: string;
+        hora: number;
+    }) {
+        return this.sigsService.checkIn(
+            body.matricula_paciente,
+            body.codigo_medico,
+            body.codigo_unidade,
+            new Date(body.data),
+            body.hora
+        );
     }
 
-    @Put(':id')
-    update(@Param('id') id: string, @Body() data: any) {
-        return this.sigsService.update(id, data);
+    @Post()
+    create(@Body() body: any) {
+        return this.sigsService.create(body);
     }
 
     @Delete(':id')
     delete(@Param('id') id: string) {
         return this.sigsService.delete(id);
-    }
-
-    @Post(':id/check-in')
-    checkIn(@Param('id') id: string) {
-        return this.sigsService.checkIn(id);
     }
 }

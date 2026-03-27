@@ -29,14 +29,21 @@ export interface Medico {
 }
 
 export interface Consulta {
-    id: string;
+    id: string; // Pode ser a matrícula no caso da integração
     data: string;
-    hora: string;
+    hora: string | number;
     paciente: Paciente;
     medico: Medico;
     setor: string;
     sala?: string;
     status: 'agendada' | 'em_andamento' | 'finalizada';
+    compositeKey?: {
+        matricula_paciente: number;
+        codigo_medico: number;
+        codigo_unidade: number;
+        data: string;
+        hora: number;
+    };
 }
 
 export interface Setor {
@@ -106,7 +113,7 @@ type TotemAction =
     | { type: 'SET_PRIORIDADE'; payload: { isPrioritario: boolean; prioridadeSelecionada?: PrioridadeSelecionada } }
     | { type: 'SET_SENHA_GERADA'; payload: SenhaGerada }
     | { type: 'ADD_TO_FILA'; payload: { consulta: Consulta; prioridade: PrioridadeSelecionada; senha: SenhaGerada } }
-    | { type: 'SET_MEDICO_SESSAO'; payload: { medico: Medico; sala: string; setor: Setor } }
+    | { type: 'SET_MEDICO_SESSAO'; payload: { medico: Medico; sala: string; setor: Setor } | null }
     | { type: 'CHAMAR_PACIENTE'; payload: string }
     | { type: 'RESET_TOTEM' }
     | { type: 'CLEAR_ERROR' };
@@ -164,6 +171,12 @@ const totemReducer = (state: TotemState, action: TotemAction): TotemState => {
                 ]
             };
         case 'SET_MEDICO_SESSAO':
+            if (!action.payload) {
+                return {
+                    ...state,
+                    medicoSessao: { medico: null, sala: null, setor: null }
+                };
+            }
             return { ...state, medicoSessao: action.payload };
         case 'CHAMAR_PACIENTE':
             return {

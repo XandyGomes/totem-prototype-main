@@ -108,9 +108,9 @@ export const InterfaceMedico: React.FC<InterfaceMedicoProps> = ({ medico, onLogo
         }).catch(err => console.error("Erro ao registrar sessão", err));
     };
 
-    const handleChamarPaciente = async (pacienteId: string) => {
+    const handleChamarPaciente = async (paciente: PacienteFila) => {
         try {
-            if (await chamarPaciente(pacienteId, salaSelecionada)) {
+            if (await chamarPaciente(paciente.consulta.compositeKey, salaSelecionada)) {
                 toast.success("Paciente Chamado", {
                     description: "A chamada foi enviada para o painel da TV."
                 });
@@ -123,16 +123,16 @@ export const InterfaceMedico: React.FC<InterfaceMedicoProps> = ({ medico, onLogo
         }
     };
 
-    const handleIniciarAtendimento = async (pacienteId: string) => {
-        if (await iniciarAtendimento(pacienteId)) {
+    const handleIniciarAtendimento = async (paciente: PacienteFila) => {
+        if (await iniciarAtendimento(paciente.consulta.compositeKey)) {
             const pacientesFila = await obterFilaMedico(medico.id);
             setFila([...pacientesFila]);
             toast.success("Atendimento Iniciado");
         }
     };
 
-    const handleFinalizarAtendimento = async (pacienteId: string) => {
-        if (await finalizarAtendimento(pacienteId)) {
+    const handleFinalizarAtendimento = async (paciente: PacienteFila) => {
+        if (await finalizarAtendimento(paciente.consulta.compositeKey)) {
             const pacientesFila = await obterFilaMedico(medico.id);
             setFila([...pacientesFila]);
             toast.success("Atendimento Finalizado");
@@ -165,9 +165,18 @@ export const InterfaceMedico: React.FC<InterfaceMedicoProps> = ({ medico, onLogo
         } catch (error) {
             console.error('Erro ao remover sessão:', error);
         } finally {
+            // Limpa o estado global no TotemContext
+            dispatch({
+                type: 'SET_MEDICO_SESSAO',
+                payload: null
+            });
             // Faz logout mesmo se houver erro ao remover sessão
             onLogout();
         }
+    };
+
+    const handleTrocarSala = () => {
+        setConfigurandoSala(true);
     };
 
     if (configurandoSala) {
@@ -255,8 +264,9 @@ export const InterfaceMedico: React.FC<InterfaceMedicoProps> = ({ medico, onLogo
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        onClick={() => setConfigurandoSala(true)}
-                                        className="h-8 w-8 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg -mr-2"
+                                        onClick={handleTrocarSala}
+                                        className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all rounded-lg"
+                                        title="Trocar Sala"
                                     >
                                         <Settings className="w-4 h-4" />
                                     </Button>
@@ -407,7 +417,7 @@ export const InterfaceMedico: React.FC<InterfaceMedicoProps> = ({ medico, onLogo
                                         {paciente.status === 'aguardando' && (
                                             <Button
                                                 size="sm"
-                                                onClick={() => handleChamarPaciente(paciente.id)}
+                                                onClick={() => handleChamarPaciente(paciente)}
                                                 className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase px-6 h-10 rounded-lg shadow-sm text-xs"
                                                 disabled={!salaSelecionada}
                                             >
@@ -420,7 +430,7 @@ export const InterfaceMedico: React.FC<InterfaceMedicoProps> = ({ medico, onLogo
                                             <div className="flex gap-2">
                                                 <Button
                                                     size="sm"
-                                                    onClick={() => handleChamarPaciente(paciente.id)}
+                                                    onClick={() => handleChamarPaciente(paciente)}
                                                     variant="outline"
                                                     className="font-black px-4 h-10 rounded-lg border-2 uppercase text-xs"
                                                 >
@@ -428,7 +438,7 @@ export const InterfaceMedico: React.FC<InterfaceMedicoProps> = ({ medico, onLogo
                                                 </Button>
                                                 <Button
                                                     size="sm"
-                                                    onClick={() => handleIniciarAtendimento(paciente.id)}
+                                                    onClick={() => handleIniciarAtendimento(paciente)}
                                                     className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase px-6 h-10 rounded-lg shadow-sm text-xs"
                                                 >
                                                     Iniciar
@@ -439,7 +449,7 @@ export const InterfaceMedico: React.FC<InterfaceMedicoProps> = ({ medico, onLogo
                                         {paciente.status === 'em_atendimento' && (
                                             <Button
                                                 size="sm"
-                                                onClick={() => handleFinalizarAtendimento(paciente.id)}
+                                                onClick={() => handleFinalizarAtendimento(paciente)}
                                                 className="bg-slate-800 hover:bg-slate-900 text-white font-black uppercase px-6 h-10 rounded-lg shadow-sm text-xs"
                                             >
                                                 <CheckCircle className="w-3.5 h-3.5 mr-2" />

@@ -1,7 +1,5 @@
-import { Consulta, mockConsultas, mockSetores, Setor } from '@/contexts/TotemContext';
+import { Consulta, mockSetores, Setor } from '@/contexts/TotemContext';
 import { sigsService } from './sigsService';
-
-// Este serviço agora integra com o Banco SIGS Simulado no NestJS
 
 export const validarConsultaAgendada = async (identificacao: string): Promise<{
     sucesso: boolean;
@@ -10,30 +8,36 @@ export const validarConsultaAgendada = async (identificacao: string): Promise<{
 }> => {
     const cpfLimpo = identificacao.replace(/\D/g, '');
 
-    // 1. Tentar buscar no Banco SIGS Simulado (NestJS)
     try {
         const agendamentosSigs = await sigsService.buscarPorCpf(cpfLimpo);
         if (agendamentosSigs && agendamentosSigs.length > 0) {
-            const agendamento = agendamentosSigs[0];
+            const ag = agendamentosSigs[0];
             return {
                 sucesso: true,
                 consulta: {
-                    id: agendamento.id, // Mantém o ID original para check-in posterior
-                    data: agendamento.data_agendamento.split('T')[0],
-                    hora: agendamento.horario || '00:00',
+                    id: String(ag.matricula_paciente),
+                    data: ag.data,
+                    hora: ag.hora,
                     paciente: {
-                        cpf: agendamento.cpf,
-                        nome: agendamento.nome_paciente,
+                        cpf: ag.paciente.cpf,
+                        nome: ag.paciente.nome,
                         idade: 0
                     },
                     medico: {
-                        id: agendamento.medico_id || 'mock',
-                        nome: agendamento.medico_nome || 'Dr(a). Médico Desconhecido',
-                        especialidade: agendamento.medico_especialidade || 'Clínico Geral',
+                        id: String(ag.medico.codigo),
+                        nome: ag.medico.nome,
+                        especialidade: 'Médico',
                         crm: '000000'
                     },
-                    setor: agendamento.setor_nome || 'Setor Verde',
-                    status: 'agendada'
+                    setor: ag.unidade.setor || ag.unidade.nome,
+                    status: 'agendada',
+                    compositeKey: {
+                        matricula_paciente: ag.matricula_paciente,
+                        codigo_medico: ag.codigo_medico,
+                        codigo_unidade: ag.codigo_unidade,
+                        data: ag.data,
+                        hora: ag.hora
+                    }
                 }
             };
         }
@@ -47,22 +51,30 @@ export const validarConsultaAgendada = async (identificacao: string): Promise<{
     };
 };
 
+export const realizarCheckIn = async (consulta: Consulta): Promise<boolean> => {
+    if (!consulta.compositeKey) return false;
+    try {
+        await sigsService.checkIn(consulta.compositeKey);
+        return true;
+    } catch (e) {
+        console.error('Erro no check-in:', e);
+        return false;
+    }
+}
 
 export const validarSetorCorreto = async (consulta: Consulta, setorAtual: string): Promise<{
     sucesso: boolean;
     setorCorreto?: Setor;
     erro?: string;
 }> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-
     const setorConsulta = mockSetores.find(setor =>
         setor.nome.toLowerCase() === consulta.setor.toLowerCase()
     );
 
     if (!setorConsulta) {
         return {
-            sucesso: false,
-            erro: 'Setor não encontrado no sistema.'
+            sucesso: true, // Se não achar o setor por nome, deixamos passar para não travar o paciente
+            setorCorreto: mockSetores[0] 
         };
     }
 
@@ -72,21 +84,12 @@ export const validarSetorCorreto = async (consulta: Consulta, setorAtual: string
     };
 };
 
-export const gerarNumeroSenha = async (prioridade: 'superprioridade' | 'prioritario' | 'comum'): Promise<string> => {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const agora = new Date();
-    const timestamp = agora.getTime().toString().slice(-4);
-
-    switch (prioridade) {
-        case 'superprioridade': return `SP${timestamp}`;
-        case 'prioritario': return `PR${timestamp}`;
-        case 'comum': return `CM${timestamp}`;
-        default: return `CM${timestamp}`;
-    }
+export const gerarNumeroSenha = async (prioridade: string): Promise<string> => {
+    const prefixo = prioridade === 'superprioridade' ? 'SP' : (prioridade === 'comum' ? 'CM' : 'PR');
+    return `${prefixo}${Math.floor(Math.random() * 9000) + 1000}`;
 };
 
 export const imprimirSenha = async (dados: any): Promise<{ sucesso: boolean; erro?: string }> => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log('Imprimindo senha:', dados);
+    console.log('FINGIMOS IMPRIMIR:', dados);
     return { sucesso: true };
 };

@@ -3,44 +3,72 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-enum StatusFila {
-  aguardando
-  chamando
-  em_atendimento
-  atendido
+model PacienteIntegracao {
+  matricula       Int       @id @map("Matricula")
+  nome            String?   @map("Nome")
+  nomeSocial      String?   @map("NomeSocial")
+  cpf             String?   @map("Cpf")
+  dataNascimento  DateTime? @map("Dt_Nasc")
+  sexo            Int?      @map("Sexo")
+  telefone        String?   @map("Telefone")
+  celular         String?   @map("Celular")
+  consultas       ConsultaIntegracao[]
+
+  @@map("pacientes")
 }
 
-model PacienteFila {
-  id               String     @id @default(uuid())
-  cpf              String
-  nome_paciente    String
-  medico_id        String
-  medico_nome      String
-  setor_id         String
-  setor_nome       String
-  senha_numero     String
-  prioridade_tipo  String
-  prioridade_nivel Int
-  status           StatusFila @default(aguardando)
-  created_at       DateTime   @default(now())
-  updated_at       DateTime   @updatedAt
+model MedicoIntegracao {
+  codigo    Int     @id @map("Codigo")
+  nome      String? @map("Nome")
+  consultas ConsultaIntegracao[]
 
-  @@map("pacientes_fila")
+  @@map("medicos")
+}
+
+model ConsultaIntegracao {
+  matricula_paciente  Int      @map("Matricula_Paciente")
+  codigo_medico       Int      @map("Codigo_Medico")
+  codigo_unidade      Int      @map("Codigo_Unidade")
+  data                DateTime @map("data")
+  hora                Int      @map("hora")
+  data_hora           DateTime? @map("data_hora")
+  presencaConfirmada  String   @map("presencaConfirmadaSN")
+  
+  // Relações
+  paciente  PacienteIntegracao @relation(fields: [matricula_paciente], references: [matricula])
+  medico    MedicoIntegracao   @relation(fields: [codigo_medico], references: [codigo])
+  unidade   UnidadeIntegracao  @relation(fields: [codigo_unidade], references: [codigo])
+
+  // Campos extras para simulação SIGS/Totem
+  status              Int?     @default(0) // 0: Agendado, 1: Presente, 2: Chamando
+  sala                String?
+
+  @@id([matricula_paciente, codigo_medico, codigo_unidade, data, hora])
+  @@map("consultas")
+}
+
+model UnidadeIntegracao {
+  codigo    Int     @id @map("Codigo_Unidade")
+  nome      String? @map("Nome_Unidade")
+  setor     String? @map("Setor")
+  consultas ConsultaIntegracao[]
+
+  @@map("unidades")
 }
 
 model ChamadaTV {
   id              String   @id @default(uuid())
-  senha           String
-  paciente_nome   String
-  medico          String
-  sala            String
-  setor           String
-  prioridade_tipo String
+  senha           String?
+  paciente_nome   String?
+  medico_nome     String?
+  sala            String?
+  setor           String?
+  prioridade_tipo String?
   created_at      DateTime @default(now())
 
   @@map("chamadas_tv")
@@ -49,53 +77,37 @@ model ChamadaTV {
 model LogOperacional {
   id        String   @id @default(uuid())
   mensagem  String
-  tipo      String   // 'INFO', 'WARN', 'ERROR', 'SUCCESS'
+  tipo      String
   detalhes  String?
   timestamp DateTime @default(now())
 
   @@map("logs_operacionais")
 }
 
-model SessaoMedico {
-  id          String   @id @default(uuid())
-  medico_id   String   @unique
-  medico_nome String
-  sala        String
-  setor       String
-  ultima_atividade DateTime @updatedAt
-
-  @@map("sessoes_medicos")
+// TABELAS PARA RELATÓRIOS (Protegidas contra limpeza de logs)
+model HistoricoSessao {
+  id              String    @id @default(uuid())
+  medico_id       Int
+  medico_nome     String
+  sala            String
+  setor           String
+  inicio          DateTime  @default(now())
+  fim             DateTime? // Preenchido no Logout ou Timeout
+  
+  @@map("report_sessoes_medicas")
 }
 
-model Medico {
-  id            String   @id @default(uuid())
-  nome          String
-  crm           String   @unique
-  especialidade String
-  login         String   @unique
-  senha         String
-  ativo         Boolean  @default(true)
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+model RegistroAtendimento {
+  id                  String    @id @default(uuid())
+  matricula_paciente  Int
+  paciente_nome       String
+  codigo_medico       Int
+  medico_nome         String
+  sala                String
+  setor               String
+  status              Int       // 3: Iniciado, 4: Finalizado
+  timestamp           DateTime  @default(now())
+  duracao_segundos    Int?      // Calculado quando for 4 (Finalizado)
 
-  @@map("medicos")
+  @@map("report_atendimentos_realizados")
 }
-
-model AgendamentoSIGS {
-  id              String   @id @default(uuid())
-  cpf             String
-  nome_paciente   String
-  medico_id       String?
-  medico_nome     String?
-  medico_especialidade String?
-  setor_id        String?
-  setor_nome      String?
-  data_agendamento DateTime
-  horario         String?
-  check_in        Boolean  @default(false)
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-
-  @@map("agendamentos_sigs")
-}
-

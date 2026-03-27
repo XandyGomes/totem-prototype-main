@@ -337,9 +337,9 @@ export const PainelAdministrativo: React.FC = () => {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {stats.sessoesAtivas.map((sessao: any) => (
-                                    <div key={sessao.id} className="flex items-center gap-3 p-3 bg-white border-2 border-slate-100 rounded-xl shadow-sm">
-                                        <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">
-                                            {sessao.medico_nome.split(' ').map((n: string) => n[0]).join('').substring(0, 2)}
+                                    <div key={sessao.medico_id} className="flex items-center gap-3 p-3 bg-white border-2 border-slate-100 rounded-xl shadow-sm">
+                                        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xs">
+                                            {sessao.medico_nome?.split(' ').map((n: string) => n[0]).join('').substring(0, 2)}
                                         </div>
                                         <div>
                                             <p className="text-xs font-black text-slate-900 uppercase truncate max-w-[120px]" title={`DR(A). ${sessao.medico_nome}`}>

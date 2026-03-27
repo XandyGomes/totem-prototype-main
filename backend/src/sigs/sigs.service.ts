@@ -6,8 +6,13 @@ export class SigsService {
     constructor(private prisma: PrismaService) { }
 
     async findAll() {
-        return this.prisma.agendamentoSIGS.findMany({
-            orderBy: { data_agendamento: 'asc' },
+        return this.prisma.consultaIntegracao.findMany({
+            include: {
+                paciente: true,
+                medico: true,
+                unidade: true,
+            },
+            orderBy: { data: 'asc' },
         });
     }
 
@@ -15,47 +20,86 @@ export class SigsService {
         // Remove pontuação do CPF para busca
         const cpfLimpo = cpf.replace(/\D/g, '');
         
-        return this.prisma.agendamentoSIGS.findMany({
+        // Busca o paciente pelo CPF
+        const pacientes = await this.prisma.pacienteIntegracao.findMany({
             where: {
                 OR: [
                     { cpf: cpfLimpo },
                     { cpf: cpf }
-                ],
-                check_in: false,
+                ]
+            }
+        });
+
+        if (pacientes.length === 0) return [];
+
+        const matriculas = pacientes.map(p => p.matricula);
+
+        // Busca as consultas pendentes para o dia de hoje
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+        return this.prisma.consultaIntegracao.findMany({
+            where: {
+                matricula_paciente: { in: matriculas },
+                presencaConfirmada: 'N',
+                data: {
+                    gte: hoje,
+                    lt: new Date(hoje.getTime() + 24 * 60 * 60 * 1000)
+                }
+            },
+            include: {
+                paciente: true,
+                medico: true,
+                unidade: true
+            }
+        });
+    }
+
+    async checkIn(matricula: number, codigoMedico: number, codigoUnidade: number, data: Date, hora: number) {
+        return this.prisma.consultaIntegracao.update({
+            where: {
+                matricula_paciente_codigo_medico_codigo_unidade_data_hora: {
+                    matricula_paciente: matricula,
+                    codigo_medico: codigoMedico,
+                    codigo_unidade: codigoUnidade,
+                    data: data,
+                    hora: hora
+                }
+            },
+            data: { 
+                presencaConfirmada: 'S',
+                status: 1 // Presente
             },
         });
     }
 
     async create(data: any) {
-        return this.prisma.agendamentoSIGS.create({
+        return this.prisma.consultaIntegracao.create({
             data: {
-                ...data,
-                data_agendamento: new Date(data.data_agendamento),
-            },
-        });
-    }
-
-    async update(id: string, data: any) {
-        const updateData = { ...data };
-        if (updateData.data_agendamento) {
-            updateData.data_agendamento = new Date(updateData.data_agendamento);
-        }
-        return this.prisma.agendamentoSIGS.update({
-            where: { id },
-            data: updateData,
+                matricula_paciente: Number(data.matricula_paciente || 1000), // Simulação se zero
+                codigo_medico: Number(data.medico_id),
+                codigo_unidade: Number(data.codigo_unidade || 101),
+                data: new Date(data.data_agendamento),
+                hora: parseInt(data.horario.replace(':', '')),
+                presencaConfirmada: 'N',
+                status: 0
+            }
         });
     }
 
     async delete(id: string) {
-        return this.prisma.agendamentoSIGS.delete({
-            where: { id },
-        });
-    }
-
-    async checkIn(id: string) {
-        return this.prisma.agendamentoSIGS.update({
-            where: { id },
-            data: { check_in: true },
+        // Como o ID na lista do front é uma string composta, fazemos o parse
+        const [matricula, medico, data, hora] = id.split('-');
+        return this.prisma.consultaIntegracao.delete({
+            where: {
+                matricula_paciente_codigo_medico_codigo_unidade_data_hora: {
+                    matricula_paciente: Number(matricula),
+                    codigo_medico: Number(medico),
+                    codigo_unidade: 101, // Mock unidade se não enviada
+                    data: new Date(data),
+                    hora: Number(hora)
+                }
+            }
         });
     }
 }

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useTotem, mockSetores } from "@/contexts/TotemContext";
-import { gerarNumeroSenha, imprimirSenha } from "@/services/consultaService";
+import { gerarNumeroSenha, imprimirSenha, realizarCheckIn } from "@/services/consultaService";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { IconePrioridade } from "@/components/IconePrioridade";
@@ -83,10 +83,8 @@ export default function ConfirmacaoPage() {
                     horarioChegada: new Date().toISOString()
                 });
 
-                // Marcar presença no Banco SIGS
-                if (consulta.id && consulta.id.length > 30) { // IDs de UUID tem 36 chars
-                    await sigsService.checkIn(consulta.id);
-                }
+                // Marcar presença no Banco SIGS por chave composta
+                await realizarCheckIn(consulta);
             } catch (e) {
                 console.error('Falha ao salvar na fila ou SIGS:', e);
                 toast.error("Erro de Sincronização", {
