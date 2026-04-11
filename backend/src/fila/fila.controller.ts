@@ -6,7 +6,6 @@ import { Roles } from '../auth/roles.decorator';
 import { AuthService } from '../auth/auth.service';
 
 @Controller('fila')
-@UseGuards(RolesGuard)
 export class FilaController {
     constructor(
         private readonly filaService: FilaService,
@@ -29,7 +28,7 @@ export class FilaController {
         return this.filaService.getChamadasTV();
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Get('dashboard')
     @Roles('ADMIN')
     getDashboard() {
@@ -66,7 +65,7 @@ export class FilaController {
         return this.filaService.removerSessao(data.medico_id);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Get('medicos')
     @Roles('ADMIN')
     findAllMedicos() {
@@ -82,14 +81,14 @@ export class FilaController {
         return this.authService.login(user);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post('reset')
     reset() {
         return this.filaService.reset();
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post('limpar-logs')
     limparLogs() {
