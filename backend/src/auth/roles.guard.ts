@@ -14,6 +14,12 @@ export class RolesGuard implements CanActivate {
       return true;
     }
     const { user } = context.switchToHttp().getRequest();
+    
+    // Proteção: Se o usuário não existe (não autenticado), nega acesso imediato
+    if (!user) {
+      return false;
+    }
+
     return requiredRoles.some((role) => user.role?.includes(role));
   }
 }
