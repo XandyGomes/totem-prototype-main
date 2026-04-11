@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('--- Iniciando Seed de Integração (SQL Server Mock) ---');
+    console.log('--- Iniciando Sincronização de Banco de Dados ---');
 
     // 1. Limpar dados antigos
     await prisma.consultaIntegracao.deleteMany({});

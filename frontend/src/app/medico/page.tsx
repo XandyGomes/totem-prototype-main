@@ -12,8 +12,10 @@ import { Medico } from "@/contexts/TotemContext";
 import { toast } from "sonner";
 import { loginMedico, cadastrarMedico } from "@/services/filaService";
 
+import { useAuth } from "@/contexts/AuthContext";
+
 export default function PaginaMedico() {
-    const [medicoSelecionado, setMedicoSelecionado] = useState<Medico | null>(null);
+    const { user, login: authLogin, logout: authLogout } = useAuth();
     const [credenciais, setCredenciais] = useState({ login: '', senha: '' });
     const [isNovoMedicoOpen, setIsNovoMedicoOpen] = useState(false);
     const [novoMedico, setNovoMedico] = useState({ nome: '', crm: '', especialidade: '', login: '', senha: '', confirmarSenha: '' });
@@ -29,9 +31,9 @@ export default function PaginaMedico() {
         setIsLoading(true);
         try {
             const data = await loginMedico(credenciais);
-            if (data && !data.error) {
-                setMedicoSelecionado(data);
-                toast.success(`Bem-vindo(a), Dr(a). ${data.nome}`);
+            if (data && data.access_token) {
+                authLogin(data.user, data.access_token);
+                toast.success(`Bem-vindo(a), Dr(a). ${data.user.nome}`);
             } else {
                 toast.error("Credenciais inválidas. Tente novamente.");
             }
@@ -71,7 +73,7 @@ export default function PaginaMedico() {
         }
     };
 
-    if (!medicoSelecionado) {
+    if (!user) {
         return (
             <div className="min-h-screen relative flex items-center justify-center p-6 overflow-hidden bg-slate-900">
                 {/* Background Decorativo */}
@@ -239,9 +241,9 @@ export default function PaginaMedico() {
 
     return (
         <InterfaceMedico
-            medico={medicoSelecionado}
+            medico={user as any}
             onLogout={() => {
-                setMedicoSelecionado(null);
+                authLogout();
                 setCredenciais({ login: '', senha: '' });
                 toast.info("Você saiu do sistema.");
             }}

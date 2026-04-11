@@ -1,15 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Query, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { FilaService } from './fila.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { AuthService } from '../auth/auth.service';
 
 @Controller('fila')
+@UseGuards(RolesGuard)
 export class FilaController {
-    constructor(private readonly filaService: FilaService) { }
+    constructor(
+        private readonly filaService: FilaService,
+        private readonly authService: AuthService
+    ) { }
 
     @Post()
     create(@Body() createFilaDto: any) {
         return this.filaService.create(createFilaDto);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get()
     findAll(@Query('medicoId') medicoId?: string) {
         return this.filaService.findAll(Number(medicoId));
@@ -20,58 +29,75 @@ export class FilaController {
         return this.filaService.getChamadasTV();
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get('dashboard')
+    @Roles('ADMIN')
     getDashboard() {
         return this.filaService.getDashboard();
     }
 
-    // Adaptado para simular o "Chamar" do SIGS usando a consulta
+    @UseGuards(JwtAuthGuard)
     @Patch('chamar')
     chamarPaciente(@Body() body: { compositeKey: any, sala: string }) {
         return this.filaService.chamarPaciente(body.compositeKey, body.sala);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Patch('iniciar')
     iniciarAtendimento(@Body() body: { compositeKey: any }) {
         return this.filaService.iniciarAtendimento(body.compositeKey);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Patch('finalizar')
     finalizarAtendimento(@Body() body: { compositeKey: any }) {
         return this.filaService.finalizarAtendimento(body.compositeKey);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Post('sessao')
     registrarSessao(@Body() data: { medico_id: string, medico_nome: string, sala: string, setor: string }) {
         return this.filaService.registrarSessao(data);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Post('sessao/remover')
     removerSessao(@Body() data: { medico_id: string }) {
         return this.filaService.removerSessao(data.medico_id);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get('medicos')
+    @Roles('ADMIN')
     findAllMedicos() {
         return this.filaService.findAllMedicos();
     }
 
     @Post('login')
     async login(@Body() data: { login: string; senha: string }) {
-        const medico = await this.filaService.loginMedico(data);
-        if (!medico) {
-            return { error: 'Credenciais inválidas' };
+        const user = await this.authService.validateUser(Number(data.login), data.senha);
+        if (!user) {
+            throw new UnauthorizedException('Credenciais inválidas');
         }
-        return medico;
+        return this.authService.login(user);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Roles('ADMIN')
     @Post('reset')
     reset() {
         return this.filaService.reset();
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Roles('ADMIN')
     @Post('limpar-logs')
     limparLogs() {
         return this.filaService.limparLogs();
+    }
+
+    @Post('cadastrar')
+    async cadastrar(@Body() data: any) {
+        return this.filaService.cadastrar(data);
     }
 }

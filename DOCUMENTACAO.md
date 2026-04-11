@@ -171,4 +171,4 @@ erDiagram
 
 ---
 
-Este documento sintetiza toda a inteligência e o planejamento por trás do **Totem NGA**, garantindo que a implementação técnica esteja alinhada aos objetivos de negócio da unidade de saúde.
+Este documento consolida as definições técnicas e o planejamento do **Totem NGA**, servindo como guia para a implementação e manutenção do sistema de gestão assistencial.

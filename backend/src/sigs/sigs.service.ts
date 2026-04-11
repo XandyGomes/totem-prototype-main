@@ -76,7 +76,7 @@ export class SigsService {
     async create(data: any) {
         return this.prisma.consultaIntegracao.create({
             data: {
-                matricula_paciente: Number(data.matricula_paciente || 1000), // Simulação se zero
+                matricula_paciente: Number(data.matricula_paciente || 0),
                 codigo_medico: Number(data.medico_id),
                 codigo_unidade: Number(data.codigo_unidade || 101),
                 data: new Date(data.data_agendamento),
@@ -95,7 +95,7 @@ export class SigsService {
                 matricula_paciente_codigo_medico_codigo_unidade_data_hora: {
                     matricula_paciente: Number(matricula),
                     codigo_medico: Number(medico),
-                    codigo_unidade: 101, // Mock unidade se não enviada
+                    codigo_unidade: 101,
                     data: new Date(data),
                     hora: Number(hora)
                 }

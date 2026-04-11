@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class FilaService {
@@ -7,15 +8,12 @@ export class FilaService {
 
     constructor(private prisma: PrismaService) { }
 
-    // Simula a entrada do paciente na fila interna (Passo 4 e 5)
     async create(data: any) {
-        // No mundo real, aqui apenas marcaríamos o check-in no SQL Server
-        // Mas para manter a lógica do Totem funcionando, podemos usar o log operacional
+        // Registro de presença no log operacional
         await this.log('INFO', `Paciente ${data.nome_paciente} (${data.senha_numero}) confirmou presença no Totem`);
         return { success: true, matricula: data.matricula_paciente };
     }
 
-    // Busca todos os pacientes que deram check-in hoje (Simulando a lista que o médico vê no SIGS)
     async findAll(codigoMedico?: number) {
         const hoje = new Date();
         hoje.setHours(0, 0, 0, 0);
@@ -38,11 +36,10 @@ export class FilaService {
         });
     }
 
-    // Simula o botão "Chamar" do médico dentro do SIGS
     async chamarPaciente(compositeKey: any, sala: string) {
         const { matricula_paciente, codigo_medico, codigo_unidade, data, hora } = compositeKey;
 
-        // 1. Atualiza o status na tabela principal de consultas (O que o SIGS faria)
+        // Atualiza o status da consulta
         const consulta = await this.prisma.consultaIntegracao.update({
             where: {
                 matricula_paciente_codigo_medico_codigo_unidade_data_hora: {
@@ -60,7 +57,7 @@ export class FilaService {
             include: { paciente: true, medico: true, unidade: true }
         });
 
-        // 2. Cria o registro na tabela de TV (O que o sistema de TV monitora)
+        // Envia para o painel de chamadas
         await this.prisma.chamadaTV.create({
             data: {
                 senha: `S-${consulta.matricula_paciente}`,
@@ -140,7 +137,7 @@ export class FilaService {
         }
     }
 
-    // Métodos para manter compatibilidade com o Front original
+    // Gerenciamento de sessões
     async registrarSessao(data: any) {
         const agora = Date.now();
         
@@ -152,7 +149,7 @@ export class FilaService {
             console.log(`[SESSION] Médico ${data.medico_nome} ENTROU na Sala ${data.sala}`);
             this.medicoSessoes.push({ ...data, lastSeen: agora });
             
-            // GRAVA PERMANENTE NO RELATÓRIO DE SESSÕES
+            // Registra início da sessão
             await this.prisma.historicoSessao.create({
                 data: {
                     medico_id: Number(data.medico_id),
@@ -193,48 +190,52 @@ export class FilaService {
     async loginMedico(data: { login: string; senha: string }) {
         console.log(`[LOGIN] Tentativa para: "${data.login}"`);
         
-        // Bloqueia se o login estiver em branco
-        if (!data.login || data.login.trim() === '') {
-            console.warn(`[LOGIN] Tentativa com campo Vazio. Bloqueado.`);
-            return null;
-        }
+        if (!data.login || data.login.trim() === '') return null;
 
         const codigo = parseInt(data.login);
-        
-        let medico;
-        if (!isNaN(codigo)) {
-            medico = await this.prisma.medicoIntegracao.findUnique({
-                where: { codigo }
-            });
-        } else {
-            medico = await this.prisma.medicoIntegracao.findFirst({
-                where: { 
-                    nome: { contains: data.login.trim().toUpperCase() }
-                }
-            });
-        }
+        const medico = await this.prisma.medicoIntegracao.findUnique({
+            where: { codigo }
+        });
 
-        if (!medico) {
-            console.warn(`[LOGIN] Médico "${data.login}" NÃO encontrado no banco.`);
-            return null;
-        }
+        if (!medico || !medico.senha) return null;
 
-        console.log(`[LOGIN] Sucesso! Médico encontrado: ${medico.nome}`);
+        const isMatch = await bcrypt.compare(data.senha, medico.senha);
+        if (!isMatch) return null;
 
         return {
             id: String(medico.codigo),
             codigo: medico.codigo,
             nome: medico.nome,
+            role: medico.role,
             especialidade: 'Médico SIGS',
             crm: medico.codigo === 500 ? '123456' : `SIGS-${medico.codigo}`
         };
     }
 
+    async cadastrar(data: any) {
+        const hashedPassword = await bcrypt.hash(data.senha, 10);
+        
+        // Se o código não for provido, geramos um baseado no último
+        let codigo = data.codigo;
+        if (!codigo) {
+            const ultimo = await this.prisma.medicoIntegracao.findFirst({ orderBy: { codigo: 'desc' } });
+            codigo = (ultimo?.codigo || 1000) + 1;
+        }
+
+        return this.prisma.medicoIntegracao.create({
+            data: {
+                codigo: Number(codigo),
+                nome: data.nome,
+                senha: hashedPassword,
+                role: data.role || 'MEDICO'
+            }
+        });
+    }
+
     async reset() {
-        // 1. Limpa a memória das sessões ativas (expulsa todos os médicos do Dashboard)
         this.medicoSessoes = [];
 
-        // 2. Limpa todas as tabelas transacionais e de cadastro
+        // Limpeza de tabelas transacionais
         await Promise.all([
             this.prisma.chamadaTV.deleteMany({}),
             this.prisma.consultaIntegracao.deleteMany({}),
@@ -271,7 +272,7 @@ export class FilaService {
         });
 
         if (consulta) {
-            // REGISTRA O INÍCIO DO ATENDIMENTO PERMANENTE
+            // Registro histórico de atendimento
             await this.prisma.registroAtendimento.create({
                 data: {
                     matricula_paciente: Number(matricula_paciente),
@@ -318,7 +319,7 @@ export class FilaService {
             duracao = Math.floor((Date.now() - inicial.timestamp.getTime()) / 1000);
         }
 
-        // REGISTRA O FIM DO ATENDIMENTO PERMANENTE
+        // Registro de encerramento
         const consulta = await this.prisma.consultaIntegracao.findUnique({
             where: {
                 matricula_paciente_codigo_medico_codigo_unidade_data_hora: {
