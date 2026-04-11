@@ -1,9 +1,8 @@
-'use client';
-
 import { SigsManager } from "@/features/admin/SigsManager";
 import { TotemProvider } from "@/contexts/TotemContext";
 
-// Força a página a ser dinâmica, evitando erros de pré-renderização estática no build do Vercel
+// Como esta página é um Server Component, o Next.js respeita a regra force-dynamic
+// e não tentará fazer a pré-renderização estática que causava o erro de contexto.
 export const dynamic = 'force-dynamic';
 
 export default function PaginaSigsAdmin() {
