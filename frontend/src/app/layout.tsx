@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { TotemProvider } from "@/contexts/TotemContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,8 +21,10 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className={`${inter.className} antialiased`}>
         <AuthProvider>
-          {children}
-          <Toaster position="top-right" richColors />
+          <TotemProvider>
+            {children}
+            <Toaster position="top-right" richColors />
+          </TotemProvider>
         </AuthProvider>
       </body>
     </html>
