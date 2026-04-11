@@ -11,15 +11,12 @@ export interface PacienteFila {
 }
 
 export const adicionarPacienteNaFila = async (pacienteFila: Omit<PacienteFila, 'id' | 'status'>): Promise<any> => {
-    // Na nova integração, "adicionar na fila" é apenas fazer o check-in no SIGS
     const { data } = await api.post('/sigs/check-in', pacienteFila.consulta.compositeKey);
     return data;
 };
 
 export const obterFilaMedico = async (medicoId: string | number): Promise<PacienteFila[]> => {
     const { data } = await api.get('/fila', { params: { medicoId } });
-    
-    // Mapeia ConsultaIntegracao para PacienteFila
     return data.map((item: any) => ({
         id: `${item.matricula_paciente}-${item.hora}`,
         consulta: {
@@ -67,7 +64,6 @@ export const obterFilaMedico = async (medicoId: string | number): Promise<Pacien
 };
 
 export const chamarPaciente = async (compositeKey: any, sala: string): Promise<boolean> => {
-    // Agora enviamos a chave composta no corpo
     const { data } = await api.patch(`/fila/chamar`, { compositeKey, sala });
     return !!data;
 };
@@ -88,7 +84,6 @@ export const finalizarAtendimento = async (compositeKey: any): Promise<boolean> 
 };
 
 export const obterEstatisticasFila = async (medicoId: string | number): Promise<any> => {
-    // Opcional: Mock ou real se implementado
     return { total: 0, aguardando: 0, emAtendimento: 0, atendidos: 0 };
 };
 
@@ -115,14 +110,8 @@ export const limparLogs = async (): Promise<any> => {
 };
 
 export const loginMedico = async (credenciais: { login: string; senha: string }): Promise<any> => {
-    // Agora chama a API real do backend que verifica o banco
-    try {
-        const { data } = await api.post('/fila/login', credenciais);
-        // Retorna o data (que pode ter o médico ou o erro)
-        return data; 
-    } catch (error) {
-        return { error: 'Servidor fora do ar ou sem VPN' };
-    }
+    const { data } = await api.post('/fila/login', credenciais);
+    return data;
 };
 
 export const obterMedicos = async (): Promise<any[]> => {
@@ -131,5 +120,6 @@ export const obterMedicos = async (): Promise<any[]> => {
 };
 
 export const cadastrarMedico = async (medico: any): Promise<any> => {
-    return { success: true };
+    const { data } = await api.post('/fila/cadastrar', medico);
+    return data;
 };

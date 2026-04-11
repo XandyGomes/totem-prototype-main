@@ -25,6 +25,8 @@ model PacienteIntegracao {
 model MedicoIntegracao {
   codigo    Int     @id @map("Codigo")
   nome      String? @map("Nome")
+  senha     String? @map("Senha")
+  role      String  @default("MEDICO") @map("Role")
   consultas ConsultaIntegracao[]
 
   @@map("medicos")

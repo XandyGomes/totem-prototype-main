@@ -17,7 +17,6 @@ O projeto é dividido em dois grandes módulos (Monorepo):
 - **Framework:** NestJS (Node.js)
 - **ORM:** Prisma
 - **Banco de Dados:** PostgreSQL (Hospedado no Supabase)
-- **Infra:** Docker ready
 - **Deploy:** Render
 
 ---

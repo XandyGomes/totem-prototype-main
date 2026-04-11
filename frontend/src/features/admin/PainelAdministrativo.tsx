@@ -25,12 +25,33 @@ import { useTotem } from '@/contexts/TotemContext';
 import { obterEstatisticasCompletas, resetarBancoDeDados, limparLogs } from '@/services/filaService';
 import { toast } from "sonner";
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const PainelAdministrativo: React.FC = () => {
+    const { user, logout } = useAuth();
     const { state } = useTotem();
     const [stats, setStats] = useState<any>(null);
     const [periodo, setPeriodo] = useState<string>('hoje');
     const [erro, setErro] = useState<string | null>(null);
+
+    // Proteção de Rota Admin
+    useEffect(() => {
+        if (!user || user.role !== 'ADMIN') {
+            // Se estiver carregando ainda, não redireciona
+            // Mas se terminou de carregar e não é admin, tchau.
+            const storedUser = typeof window !== 'undefined' ? localStorage.getItem('nga_user') : null;
+            if (!storedUser) {
+                toast.error("Acesso restrito. Faça login como Administrador.");
+                logout();
+            } else {
+                const parsedUser = JSON.parse(storedUser);
+                if (parsedUser.role !== 'ADMIN') {
+                    toast.error("Acesso negado. Apenas administradores.");
+                    logout();
+                }
+            }
+        }
+    }, [user, logout]);
 
     useEffect(() => {
         const atualizarStats = async () => {
@@ -60,14 +81,19 @@ export const PainelAdministrativo: React.FC = () => {
         </div>
     );
 
-    if (!stats) return <div className="h-full w-full flex items-center justify-center bg-slate-50"><div className="text-center font-black animate-pulse text-blue-600 uppercase text-4xl">Carregando Inteligência NGA...</div></div>;
+    if (!stats || (user && user.role !== 'ADMIN')) return <div className="h-full w-full flex items-center justify-center bg-slate-50"><div className="text-center font-black animate-pulse text-blue-600 uppercase text-4xl">Validando Acesso NGA...</div></div>;
 
     return (
-        <div className="h-full w-full bg-slate-50 p-6 space-y-6 overflow-y-auto pb-20">
+        <div className="h-full w-full bg-slate-50 p-6 space-y-6 overflow-y-auto pb-20 border-t-8 border-blue-600">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-3xl font-black text-slate-900 uppercase">Gestão & Performance NGA</h1>
-                    <p className="text-slate-500 font-bold uppercase tracking-wider text-sm mt-1 uppercase">Console Administrativo Centralizado</p>
+                <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg rotate-3 group hover:rotate-0 transition-transform cursor-pointer">
+                        <Activity className="w-8 h-8" />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-black text-slate-900 uppercase leading-none">Gestão & Performance</h1>
+                        <p className="text-slate-500 font-bold uppercase tracking-wider text-[10px] mt-1">Console Administrativo • Olá, {user?.nome}</p>
+                    </div>
                 </div>
                 <div className="flex bg-white p-1 rounded-xl shadow-sm border-2 border-slate-200">
                     <Badge
@@ -91,6 +117,7 @@ export const PainelAdministrativo: React.FC = () => {
                     >
                         Mês
                     </Badge>
+                    <Button variant="ghost" size="sm" onClick={logout} className="ml-2 text-red-500 font-black uppercase text-[10px] hover:bg-red-50">Sair</Button>
                 </div>
             </div>
 
@@ -133,7 +160,7 @@ export const PainelAdministrativo: React.FC = () => {
                 <Card className="lg:col-span-2 border-2 shadow-sm rounded-2xl overflow-hidden">
                     <CardHeader className="bg-white border-b p-6">
                         <div className="flex justify-between items-center">
-                            <CardTitle className="text-xl font-black uppercase flex items-center gap-3 uppercase">
+                            <CardTitle className="text-xl font-black uppercase flex items-center gap-3">
                                 <BarChart3 className="w-6 h-6 text-blue-600" />
                                 Ocupação de Salas de Espera por Setor
                             </CardTitle>
@@ -145,7 +172,7 @@ export const PainelAdministrativo: React.FC = () => {
                             {stats.statsPorSetor?.map((setor: any) => (
                                 <div key={setor.id} className="space-y-2">
                                     <div className="flex justify-between items-end">
-                                        <div className="flex items-center gap-3 text-sm font-black text-slate-700 uppercase uppercase">
+                                        <div className="flex items-center gap-3 text-sm font-black text-slate-700 uppercase">
                                             <div className="w-4 h-4 rounded-full" style={{ backgroundColor: setor.cor }}></div>
                                             {setor.nome}
                                         </div>
@@ -177,7 +204,7 @@ export const PainelAdministrativo: React.FC = () => {
 
                 <Card className="border-2 shadow-sm rounded-2xl overflow-hidden bg-white">
                     <CardHeader className="border-b p-6">
-                        <CardTitle className="text-xl font-black uppercase flex items-center gap-3 uppercase">
+                        <CardTitle className="text-xl font-black uppercase flex items-center gap-3">
                             <Activity className="w-6 h-6 text-emerald-600" />
                             Status do Sistema
                         </CardTitle>
@@ -224,7 +251,7 @@ export const PainelAdministrativo: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card className="border-2 shadow-sm rounded-2xl overflow-hidden">
                     <CardHeader className="bg-white border-b p-6 flex flex-row items-center justify-between">
-                        <CardTitle className="text-xl font-black uppercase flex items-center gap-3 uppercase">
+                        <CardTitle className="text-xl font-black uppercase flex items-center gap-3">
                             <Activity className="w-6 h-6 text-blue-600" />
                             Operacional (Logs)
                         </CardTitle>
@@ -250,7 +277,6 @@ export const PainelAdministrativo: React.FC = () => {
                                                 toast.success(`${result.count} logs removidos!`, {
                                                     description: "Histórico de logs limpo com sucesso."
                                                 });
-                                                // Aguarda o toast aparecer antes de recarregar
                                                 setTimeout(() => {
                                                     window.location.reload();
                                                 }, 1500);
@@ -277,7 +303,6 @@ export const PainelAdministrativo: React.FC = () => {
                                             toast.success("Banco de dados resetado!", {
                                                 description: "Logs preservados para rastreabilidade."
                                             });
-                                            // Aguarda o toast aparecer antes de recarregar
                                             setTimeout(() => {
                                                 window.location.reload();
                                             }, 1500);
@@ -324,7 +349,7 @@ export const PainelAdministrativo: React.FC = () => {
 
                 <Card className="border-2 shadow-sm rounded-2xl overflow-hidden">
                     <CardHeader className="bg-white border-b p-6">
-                        <CardTitle className="text-xl font-black uppercase flex items-center gap-3 uppercase">
+                        <CardTitle className="text-xl font-black uppercase flex items-center gap-3">
                             <Users className="w-6 h-6 text-indigo-600" />
                             Alocações Ativas
                         </CardTitle>
@@ -381,7 +406,7 @@ const KPICard = ({ title, value, icon: Icon, color, trend, trendUp }: any) => {
                     </div>
                 </div>
                 <h3 className="text-3xl font-black text-slate-900 leading-none">{value}</h3>
-                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-2 uppercase">{title}</p>
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-2">{title}</p>
             </CardContent>
         </Card>
     );
@@ -401,11 +426,11 @@ const SystemStatusItem = ({ label, status, color, icon: Icon }: any) => {
         <div className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors">
             <div className="flex items-center gap-3">
                 {Icon && <Icon className="w-5 h-5 text-slate-400" />}
-                <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider uppercase">{label}</span>
+                <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider">{label}</span>
             </div>
             <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${colors.dot} ${color === 'emerald' ? 'animate-pulse' : ''}`}></div>
-                <span className={`text-[10px] font-black uppercase ${colors.text} uppercase`}>{status}</span>
+                <span className={`text-[10px] font-black uppercase ${colors.text}`}>{status}</span>
             </div>
         </div>
     );

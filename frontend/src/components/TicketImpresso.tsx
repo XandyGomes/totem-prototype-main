@@ -21,7 +21,7 @@ const TicketImpresso = () => {
 
     const dadosImpressao = senhaGerada || {
         numero: "P-001",
-        prioridade: { descricao: "Prioridade Teste (Mock)", tipo: "mock" },
+        prioridade: { descricao: "Atendimento Normal", tipo: "normal" },
         horario: new Date().toLocaleTimeString(),
     };
 

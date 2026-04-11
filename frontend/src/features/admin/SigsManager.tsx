@@ -113,7 +113,7 @@ export const SigsManager: React.FC = () => {
     };
 
     const handleDelete = async (id: string) => {
-        if (confirm('Deseja excluir este agendamento simulado?')) {
+        if (confirm('Deseja excluir este agendamento?')) {
             try {
                 await sigsService.delete(id);
                 toast.success('Agendamento removido');
@@ -141,8 +141,8 @@ export const SigsManager: React.FC = () => {
                         </Button>
                     </Link>
                     <div>
-                        <h1 className="text-3xl font-black text-slate-900 uppercase">Simulador de Banco SIGS</h1>
-                        <p className="text-slate-500 font-bold uppercase tracking-wider text-sm mt-1">Gerenciamento de Agendamentos Externos (Mock)</p>
+                        <h1 className="text-3xl font-black text-slate-900 uppercase">Gerenciamento Banco SIGS</h1>
+                        <p className="text-slate-500 font-bold uppercase tracking-wider text-sm mt-1">Integração de Agendamentos Externos</p>
                     </div>
                 </div>
 
@@ -160,7 +160,7 @@ export const SigsManager: React.FC = () => {
                     <CardHeader className="bg-white border-b p-6">
                         <CardTitle className="text-xl font-black uppercase flex items-center gap-3">
                             <Plus className="w-6 h-6 text-blue-600" />
-                            Cadastrar Agendamento Simulado
+                            Cadastrar Novo Agendamento
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-8">
@@ -283,7 +283,7 @@ export const SigsManager: React.FC = () => {
                             ) : filteredAgendamentos.length === 0 ? (
                                 <div className="p-12 text-center text-slate-400 font-bold uppercase italic tracking-widest text-sm flex flex-col items-center gap-4">
                                     <AlertCircle className="w-12 h-12 text-slate-300" />
-                                    <span>Nenhum agendamento encontrado no banco simulado</span>
+                                    <span>Nenhum agendamento encontrado</span>
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
@@ -328,7 +328,7 @@ export const SigsManager: React.FC = () => {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={() => handleDelete(itemId)} // No real excluiria pela chave composta se houver endpoint, mas aqui é simulado
+                                                                onClick={() => handleDelete(itemId)}
                                                                 className="text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
                                                             >
                                                                 <Trash2 className="w-5 h-5" />
