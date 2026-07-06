@@ -1,6 +1,10 @@
 # 🏥 Totem Prototype - NGA (Núcleo de Gestão Assistencial)
 
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Vercel-black?style=for-the-badge)](https://totem-prototype-main.vercel.app)
+
 Este é um sistema completo de gestão de filas e atendimento para o **NGA**, desenvolvido com uma arquitetura moderna de monorepo, focado em performance, design premium e escalabilidade.
+
+🌐 **App online:** [totem-prototype-main.vercel.app](https://totem-prototype-main.vercel.app)
 
 ## 🚀 Arquitetura e Tecnologias
 
