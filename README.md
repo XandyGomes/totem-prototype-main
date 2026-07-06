@@ -42,7 +42,7 @@ totem-prototype/
 ### 1. Clone e Instalação
 ```bash
 git clone https://github.com/XandyGomes/totem-prototype-main.git
-cd totem-prototype
+cd totem-prototype-main
 npm install
 ```
 
@@ -101,4 +101,4 @@ O projeto está configurado para Deploy Contínuo (CI/CD):
 ---
 
 ## 📄 Licença
-Este projeto é privado e destinado ao uso do Núcleo de Gestão Assistencial (NGA).
+Protótipo desenvolvido para o Núcleo de Gestão Assistencial (NGA), compartilhado publicamente como peça de portfólio técnico.
