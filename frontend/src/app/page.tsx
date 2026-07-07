@@ -48,7 +48,7 @@ export default function HomePage() {
       title: "Módulo Administrativo",
       description: "Configurações de rede, mapeamento de salas, logs e métricas de desempenho.",
       icon: Settings,
-      path: "/admin",
+      path: "/admin/login",
       color: "bg-slate-700",
       textColor: "text-slate-700",
       lightColor: "bg-slate-100"
